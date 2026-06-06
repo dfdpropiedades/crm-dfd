@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRM Inmobiliaria — DFD Propiedades</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --bg: #F5F2EE;
+  --bg2: #EDEAE4;
+  --surface: #FFFFFF;
+  --border: #D8D2C8;
+  --text: #1A1714;
+  --muted: #7A746C;
+  --accent: #C4531A;
+  --accent2: #8B3A12;
+  --gold: #B8922A;
+  --green: #2A6B3C;
+  --blue: #1E4E7A;
+  --purple: #5A3A7A;
+  --r: 10px;
+  --r-sm: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* LAYOUT */
+.app-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.sidebar { background: var(--text); color: #F5F2EE; padding: 0; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.sidebar-logo .brand { font-family: 'DM Serif Display', serif; font-size: 20px; line-height: 1.2; color: #fff; }
+.sidebar-logo .sub { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+.sidebar-logo .dot { color: var(--accent); }
+.nav-section { padding: 16px 12px 8px; }
+.nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.35); padding: 0 12px; margin-bottom: 6px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--r-sm); cursor: pointer; font-size: 13.5px; color: rgba(255,255,255,0.65); transition: all .15s; border: none; background: none; width: 100%; text-align: left; }
+.nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.nav-item.active { background: var(--accent); color: #fff; }
+.nav-item i { width: 16px; text-align: center; font-size: 14px; }
+.nav-badge { margin-left: auto; background: rgba(255,255,255,0.2); color: #fff; font-size: 10px; padding: 1px 6px; border-radius: 20px; }
+.nav-item.active .nav-badge { background: rgba(255,255,255,0.3); }
+.sidebar-footer { margin-top: auto; padding: 16px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: rgba(255,255,255,0.3); }
+
+/* MAIN */
+.main { padding: 32px 36px; overflow-y: auto; }
+.page-header { margin-bottom: 28px; }
+.page-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); }
+.page-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* STATS ROW */
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 20px; }
+.stat-num { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); line-height: 1; }
+.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.stat-card.accent { background: var(--accent); border-color: var(--accent); }
+.stat-card.accent .stat-num, .stat-card.accent .stat-label { color: #fff; }
+.stat-card.accent .stat-label { opacity: 0.8; }
+
+/* CARDS GRID */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+.item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 20px; position: relative; transition: box-shadow .15s; padding-bottom: 55px; }
+.item-card:hover { box-shadow: var(--shadow); }
+.item-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.item-card-title { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.item-card-price { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--accent); white-space: nowrap; }
+.item-card-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.tag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.tag-type { background: #EEE8F5; color: var(--purple); }
+.tag-op-venta { background: #FFF0E8; color: var(--accent); }
+.tag-op-alquiler { background: #E8F5EE; color: var(--green); }
+.tag-op-temp { background: #E8F0FF; color: var(--blue); }
+.tag-zone { background: var(--bg2); color: var(--muted); }
+.tag-inv { background: #FFF8E0; color: var(--gold); }
+.item-card-detail { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 12px; }
+.item-card-detail span { display: flex; align-items: center; gap: 4px; }
+.item-card-owner { font-size: 11px; color: var(--muted); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 6px; }
+.card-actions-bottom { position: absolute; bottom: 14px; left: 20px; right: 14px; display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.card-actions-left { display: flex; gap: 10px; }
+.btn-delete-item { background: transparent; color: #b83a3a; border: none; cursor: pointer; font-size: 12px; opacity: 0.6; transition: opacity .15s; }
+.btn-delete-item:hover { opacity: 1; }
+.btn-edit-item { background: transparent; color: var(--blue); border: none; cursor: pointer; font-size: 12px; opacity: 0.7; transition: opacity .15s; }
+.btn-edit-item:hover { opacity: 1; }
+.btn-match { background: var(--accent); color: #fff; border: none; padding: 5px 12px; border-radius: var(--r-sm); font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .15s; }
+.btn-match:hover { background: var(--accent2); }
+
+/* FORM SECTION */
+.section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 24px; margin-bottom: 24px; }
+.section-title { font-size: 15px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+.section-title i { color: var(--accent); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group full { grid-column: 1/-1; }
+label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+input, select, textarea { padding: 9px 12px; font-size: 13px; border: 1px solid var(--border); border-radius: var(--r-sm); background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; transition: border .15s; width: 100%; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); background: #fff; }
+textarea { resize: vertical; min-height: 70px; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.checkbox-row input[type="checkbox"] { width: auto; accent-color: var(--accent); }
+.btn-primary { background: var(--accent); color: #fff; border: none; padding: 11px 22px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: inline-flex; align-items: center; gap: 7px; transition: background .15s; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); padding: 10px 18px; border-radius: var(--r-sm); font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.form-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+/* MATCH RESULTS */
+.match-result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 20px; }
+.match-result-header { background: var(--text); color: #fff; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+.match-result-header .prop-name { font-family: 'DM Serif Display', serif; font-size: 18px; }
+.match-result-header .prop-meta { font-size: 12px; opacity: 0.6; margin-top: 2px; }
+.match-count-badge { background: var(--accent); color: #fff; border-radius: 20px; padding: 4px 14px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.match-summary { padding: 12px 20px; background: #FFF8F5; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--accent2); }
+.match-entries { padding: 12px 20px; display: flex; flex-direction: column; gap: 10px; }
+.match-entry { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 12px 14px; }
+.match-entry-left .name { font-size: 14px; font-weight: 600; }
+.match-entry-left .reason { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.match-entry-left .contact { font-size: 11px; color: var(--blue); margin-top: 3px; }
+.score-badge { padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+.score-alto { background: #D4EDDA; color: var(--green); }
+.score-medio { background: #FFF3CD; color: #7A5A00; }
+.score-bajo { background: #F8D7DA; color: #8B1A1A; }
+.empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-state i { font-size: 40px; opacity: 0.3; display: block; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* SEARCH CARDS */
+.search-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 20px; position: relative; padding-bottom: 55px; }
+.search-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.search-name { font-size: 15px; font-weight: 600; }
+.search-date { font-size: 11px; color: var(--muted); }
+.search-detail { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+.search-contact { font-size: 12px; color: var(--blue); margin-top: 6px; display: flex; align-items: center; gap: 5px; }
+.btn-view-client { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: var(--r-sm); font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-view-client:hover { background: var(--bg2); }
+
+/* NOTAS */
+.notes-section { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+.notes-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.note-item { background: #FFFDF5; border: 1px solid #E8D9A0; border-radius: var(--r-sm); padding: 8px 10px; position: relative; }
+.note-item-text { font-size: 12px; color: var(--text); line-height: 1.5; padding-right: 20px; }
+.note-item-meta { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.note-delete { position: absolute; top: 6px; right: 8px; background: none; border: none; cursor: pointer; color: var(--muted); font-size: 11px; padding: 2px; }
+.note-delete:hover { color: #8B1A1A; }
+.note-input-row { display: flex; gap: 6px; }
+
+/* MODAL */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: var(--r); padding: 28px; max-width: 520px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }
+.modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 4px; }
+.modal-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+.modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 18px; cursor: pointer; color: var(--muted); }
+.modal-section { margin-bottom: 16px; }
+.modal-section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 6px; }
+.modal-section-content { font-size: 13px; line-height: 1.6; }
+.modal-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand">DFD<span class="dot">.</span><br>Propiedades</div>
+      <div class="sub">CRM — Rosario</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <button class="nav-item active" id="btn-nav-dashboard" onclick="showPanel('dashboard')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+      <button class="nav-item" id="btn-nav-propiedades" onclick="showPanel('propiedades')"><i class="fa-solid fa-building"></i> Propiedades <span class="nav-badge" id="nb-props">0</span></button>
+      <button class="nav-item" id="btn-nav-busquedas" onclick="showPanel('busquedas')"><i class="fa-solid fa-magnifying-glass"></i> Búsquedas <span class="nav-badge" id="nb-searches">0</span></button>
+      <button class="nav-item" id="btn-nav-matches" onclick="showPanel('matches')"><i class="fa-solid fa-heart"></i> Matches <span class="nav-badge" id="nb-matches">0</span></button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Cargar / Gestionar</div>
+      <button class="nav-item" id="btn-nav-nueva-prop" onclick="clearNewProp(); showPanel('nueva-prop')"><i class="fa-solid fa-plus"></i> Nueva propiedad</button>
+      <button class="nav-item" id="btn-nav-nueva-busqueda" onclick="clearNewSearch(); showPanel('nueva-busqueda')"><i class="fa-solid fa-plus"></i> Nueva búsqueda</button>
+    </div>
+    <div class="sidebar-footer">v1.2 · DFD Propiedades</div>
+  </aside>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div id="panel-dashboard" class="panel active">
+      <div class="page-header">
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Resumen del CRM — DFD Propiedades</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card accent">
+          <div class="stat-num" id="stat-props">0</div>
+          <div class="stat-label">Propiedades activas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-searches">0</div>
+          <div class="stat-label">Búsquedas activas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-matches">0</div>
+          <div class="stat-label">Propiedades Matcheadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-venta">0</div>
+          <div class="stat-label">Propiedades en venta</div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> Propiedades recientes</div>
+        <div class="cards-grid" id="dashboard-recent"></div>
+      </div>
+    </div>
+
+    <!-- PROPIEDADES -->
+    <div id="panel-propiedades" class="panel">
+      <div class="page-header">
+        <div class="page-title">Propiedades</div>
+        <div class="page-sub">Stock actual de propiedades disponibles</div>
+      </div>
+      <div class="cards-grid" id="props-list"></div>
+    </div>
+
+    <!-- BÚSQUEDAS -->
+    <div id="panel-busquedas" class="panel">
+      <div class="page-header">
+        <div class="page-title">Búsquedas activas</div>
+        <div class="page-sub">Clientes con búsquedas registradas</div>
+      </div>
+      <div class="cards-grid" id="searches-list"></div>
+    </div>
+
+    <!-- MATCHES -->
+    <div id="panel-matches" class="panel">
+      <div class="page-header">
+        <div class="page-title">Matches de la Propiedad</div>
+        <div class="page-sub">Resultados cruzados usando zona, precio, dormitorios y operación</div>
+      </div>
+      <div id="matches-list">
+        <div class="empty-state">
+          <i class="fa-solid fa-heart"></i>
+          <p>Hacé clic en "Buscar matches" en cualquier propiedad de la lista para empezar.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULARIO PROPIEDAD (ALTA Y EDICIÓN) -->
+    <div id="panel-nueva-prop" class="panel">
+      <div class="page-header">
+        <div class="page-title" id="form-prop-title">Nueva propiedad</div>
+        <div class="page-sub" id="form-prop-sub">Cargá una propiedad en la base de datos</div>
+      </div>
+      <div class="section-card">
+        <div class="section-title"><i class="fa-solid fa-building"></i> Datos de la propiedad</div>
+        <input type="hidden" id="np-id"> <!-- ID Oculto para identificar si es edición -->
+        <div class="form-grid">
+          <div class="form-group"><label>Dirección</label><input id="np-addr" placeholder="Ej: Mendoza 1234"></div>
+          <div class="form-group"><label>Barrio / Zona</label><input id="np-zone" placeholder="Ej: Centro, Arroyito, Echesortu"></div>
+          <div class="form-group"><label>Tipo</label>
+            <select id="np-type"><option value="">Seleccionar...</option><option>Casa</option><option>Depto</option><option>Monoambiente</option><option>Depto pasillo</option><option>Duplex</option><option>Local</option><option>Oficina</option><option>Terreno</option><option>Otro</option></select>
+          </div>
+          <div class="form-group"><label>Operación</label>
+            <select id="np-op"><option value="">Seleccionar...</option><option>Venta</option><option>Alquiler</option><option>Alquiler temporario</option></select>
+          </div>
+          <div class="form-group"><label>Precio (Ingresar solo números)</label><input id="np-price" type="number" placeholder="Ej: 80000"></div>
+          <div class="form-group"><label>Moneda</label>
+            <select id="np-currency"><option value="USD">USD (Dólares)</option><option value="ARS">ARS ($ Pesos)</option></select>
+          </div>
+          <div class="form-group"><label>Superficie (m²)</label><input id="np-sqm" type="number" placeholder="65"></div>
+          <div class="form-group"><label>Dormitorios</label>
+            <select id="np-rooms"><option value="">—</option><option value="0">0 (monoambiente)</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4+</option></select>
+          </div>
+          <div class="form-group"><label>Propietario</label><input id="np-owner" placeholder="Nombre del propietario"></div>
+          <div class="form-group"><label>Amenities</label><input id="np-amenities" placeholder="Piscina, SUM, gimnasio..."></div>
+          <div class="form-group full" style="display:flex;gap:20px;padding-top:4px">
+            <div class="checkbox-row"><input type="checkbox" id="np-cochera"><label for="np-cochera" style="font-size:13px;text-transform:none;letter-spacing:0">Cochera</label></div>
+            <div class="checkbox-row"><input type="checkbox" id="np-patio"><label for="np-patio" style="font-size:13px;text-transform:none;letter-spacing:0">Patio / Jardín</label></div>
+            <div class="checkbox-row"><input type="checkbox" id="np-credito"><label for="np-credito" style="font-size:13px;text-transform:none;letter-spacing:0">Apto crédito</label></div>
+          </div>
+          <div class="form-group full"><label>Descripción adicional</label><textarea id="np-desc" placeholder="Descripción completa de la propiedad..."></textarea></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" onclick="saveProperty()"><i class="fa-solid fa-floppy-disk"></i> <span id="btn-prop-text">Guardar Propiedad</span></button>
+          <button class="btn-secondary" onclick="clearNewProp()">Limpiar / Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORMULARIO BÚSQUEDA (ALTA Y EDICIÓN) -->
+    <div id="panel-nueva-busqueda" class="panel">
+      <div class="page-header">
+        <div class="page-title" id="form-search-title">Nueva búsqueda</div>
+        <div class="page-sub" id="form-search-sub">Registrá los requisitos de un cliente</div>
+      </div>
+      <div class="section-card">
+        <div class="section-title"><i class="fa-solid fa-magnifying-glass"></i> Datos del cliente</div>
+        <input type="hidden" id="ns-id"> <!-- ID Oculto para identificar si es edición -->
+        <div class="form-grid">
+          <div class="form-group"><label>Nombre del cliente</label><input id="ns-name" placeholder="Nombre completo"></div>
+          <div class="form-group"><label>Contacto (tel / email)</label><input id="ns-contact" placeholder="341-555-5555"></div>
+          <div class="form-group"><label>Fecha</label><input id="ns-date" type="date"></div>
+          <div class="form-group"><label>Captación</label>
+            <select id="ns-captura"><option value="">—</option><option>Web</option><option>Instagram</option><option>Contacto</option><option>Referido</option></select>
+          </div>
+          <div class="form-group"><label>Operación buscada</label>
+            <select id="ns-op"><option value="Cualquiera">Cualquiera</option><option value="Venta">Venta</option><option value="Alquiler">Alquiler</option><option value="Alquiler temporario">Alquiler temporario</option></select>
+          </div>
+          <div class="form-group"><label>Tipo de propiedad (Separados por coma)</label><input id="ns-type" placeholder="Ej: Casa, Depto, Monoambiente"></div>
+          <div class="form-group"><label>Zonas de interés (Separadas por coma)</label><input id="ns-zones" placeholder="Ej: Centro, Arroyito, Alberdi, Agote"></div>
+          <div class="form-group"><label>Presupuesto máximo (Solo números)</label><input id="ns-budget" type="number" placeholder="Ej: 90000"></div>
+          <div class="form-group"><label>Moneda del Presupuesto</label>
+            <select id="ns-currency"><option value="USD">USD (Dólares)</option><option value="ARS">ARS ($ Pesos)</option></select>
+          </div>
+          <div class="form-group"><label>Dormitorios mínimos</label>
+            <select id="ns-rooms"><option value="Cualquiera">Cualquiera</option><option value="0">Monoambiente</option><option value="1">1 Dormitorio</option><option value="2">2 Dormitorios</option><option value="3">3 Dormitorios</option><option value="4">4+ Dormitorios</option></select>
+          </div>
+          <div class="form-group full"><label>Características clave</label><input id="ns-features" placeholder="Apto crédito, luminoso, nuevo..."></div>
+          <div class="form-group full" style="display:flex;gap:20px;padding-top:4px">
+            <div class="checkbox-row"><input type="checkbox" id="ns-patio"><label for="ns-patio" style="font-size:13px;text-transform:none;letter-spacing:0">Requiere Patio / Jardín</label></div>
+            <div class="checkbox-row"><input type="checkbox" id="ns-cochera"><label for="ns-cochera" style="font-size:13px;text-transform:none;letter-spacing:0">Requiere Cochera</label></div>
+            <div class="checkbox-row"><input type="checkbox" id="ns-inv"><label for="ns-inv" style="font-size:13px;text-transform:none;letter-spacing:0">Es Inversión</label></div>
+          </div>
+          <div class="form-group full"><label>Notas iniciales adicionales</label><textarea id="ns-notes" placeholder="Observaciones del cliente..."></textarea></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" onclick="saveSearch()"><i class="fa-solid fa-floppy-disk"></i> <span id="btn-search-text">Guardar búsqueda</span></button>
+          <button class="btn-secondary" onclick="clearNewSearch()">Limpiar / Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL CLIENTE -->
+<div class="modal-overlay" id="client-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    <div class="modal-title" id="modal-name">—</div>
+    <div class="modal-sub" id="modal-date">—</div>
+    <div class="modal-section">
+      <div class="modal-section-label">Búsqueda</div>
+      <div class="modal-tags" id="modal-tags"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-label">Detalles requeridos</div>
+      <div class="modal-section-content" id="modal-detail"></div>
+    </div>
+    <div class="modal-section" id="modal-contact-wrap" style="display:none">
+      <div class="modal-section-label">Contacto</div>
+      <div class="modal-section-content" id="modal-contact" style="color:var(--blue)"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-label" style="display:flex;align-items:center;gap:6px">
+        <i class="fa-solid fa-note-sticky" style="color:var(--gold)"></i> Seguimiento / Notas <span id="modal-notes-count" style="font-weight:400;color:var(--muted)"></span>
+      </div>
+      <div class="notes-list" id="modal-notes-list"></div>
+      <div class="note-input-row" style="margin-top:8px">
+        <input type="text" id="modal-note-input" placeholder="Ej: Lo llamé y agendamos visita para el martes..." style="flex:1" onkeydown="if(event.key==='Enter')saveModalNote()">
+        <button class="btn-note" onclick="saveModalNote()" style="background:var(--gold);color:#fff;border:none;padding:7px 12px;border-radius:var(--r-sm);cursor:pointer;font-weight:600">Guardar</button>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-secondary" style="font-size:12px" onclick="exportClientWA()"><i class="fa-brands fa-whatsapp" style="color:#25D366"></i> Copiar ficha para WhatsApp</button>
+      <button class="btn-secondary" style="font-size:12px" onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Datos semilla por defecto
+const DEFAULT_SEARCHES = [
+  { id:1, date:"12/05/2026", name:"Majo Andretta", captura:"Web", op:"Venta", type:"Casa", zones:"Echesortu, Lourdes, Agote, San Nicolas", rooms:"2", budget:90000, currency:"USD", features:"Apto crédito", patio:true, cochera:true, inv:false, contact:"", notes:"" },
+  { id:2, date:"12/05/2026", name:"Jorge", captura:"Contacto", op:"Venta", type:"Local, Casa, Depto", zones:"Centro", rooms:"Cualquiera", budget:65000, currency:"USD", features:"Inversión", patio:false, cochera:false, inv:true, contact:"", notes:"" },
+  { id:3, date:"21/05/2026", name:"Marina bv ronde", captura:"Contacto", op:"Alquiler", type:"Depto", zones:"Alberdi, Arroyito", rooms:"1", budget:600000, currency:"ARS", features:"Inversión", patio:false, cochera:false, inv:true, contact:"", notes:"" },
+  { id:8, date:"05/06/2026", name:"Romina", captura:"Instagram", op:"Venta", type:"Depto pasillo, Depto", zones:"Centro", rooms:"1", budget:60000, currency:"USD", features:"Patio o balcón", patio:true, cochera:false, inv:false, contact:"54 9 3416 91-0113", notes:"" }
+];
+
+const DEFAULT_PROPERTIES = [
+  { id:1, type:"Casa", op:"Venta", addr:"Superi 446", zone:"Alberdi", sqm:454, price:400000, currency:"USD", rooms:"3", banos:"4", cochera:true, patio:true, credito:false, amenities:"", owner:"DFD", desc:"Casa grande en Alberdi, 3 dormitorios." },
+  { id:7, type:"Depto", op:"Venta", addr:"San Nicolas 200", zone:"Luis Agote", sqm:57, price:62000, currency:"USD", rooms:"2", banos:"1", cochera:false, patio:false, credito:false, amenities:"", owner:"", desc:"Depto en zona Agote." },
+  { id:15, type:"Depto", op:"Venta", addr:"San Luis 2227", zone:"Centro", sqm:50, price:70000, currency:"USD", rooms:"1", banos:"1", cochera:false, patio:true, credito:true, amenities:"", owner:"DFD", desc:"Excelente para inversores en Centro." }
+];
+
+// Inicialización de bases de datos
+let properties = JSON.parse(localStorage.getItem('dfd_properties')) || DEFAULT_PROPERTIES;
+let searches = JSON.parse(localStorage.getItem('dfd_searches')) || DEFAULT_SEARCHES;
+let clientNotes = JSON.parse(localStorage.getItem('dfd_notes')) || {};
+let activeClientId = null;
+
+function saveData() {
+  localStorage.setItem('dfd_properties', JSON.stringify(properties));
+  localStorage.setItem('dfd_searches', JSON.stringify(searches));
+  localStorage.setItem('dfd_notes', JSON.stringify(clientNotes));
+}
+
+function opTagClass(op) {
+  if (!op) return 'tag-op-venta';
+  const l = op.toLowerCase();
+  if (l.includes('temp')) return 'tag-op-temp';
+  if (l.includes('alquiler')) return 'tag-op-alquiler';
+  return 'tag-op-venta';
+}
+
+function formatPrice(price, currency) {
+  if(!price) return "Consultar";
+  return (currency === "USD" ? "USD " : "$ ") + Number(price).toLocaleString('es-AR');
+}
+
+// Renders de tarjetas con botón "Editar" añadido
+function renderPropCard(p, mini=false) {
+  return `<div class="item-card">
+    <div class="item-card-top">
+      <div>
+        <div class="item-card-title">${p.addr}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${p.zone}</div>
+      </div>
+      <div class="item-card-price">${formatPrice(p.price, p.currency)}</div>
+    </div>
+    <div class="item-card-meta">
+      <span class="tag tag-type">${p.type}</span>
+      <span class="tag ${opTagClass(p.op)}">${p.op}</span>
+      ${p.zone ? `<span class="tag tag-zone"><i class="fa-solid fa-location-dot" style="font-size:10px"></i> ${p.zone}</span>` : ''}
+    </div>
+    <div class="item-card-detail">
+      ${p.rooms ? `<span><i class="fa-solid fa-bed"></i> ${p.rooms} dorm.</span>` : ''}
+      ${p.sqm ? `<span><i class="fa-solid fa-ruler-combined"></i> ${p.sqm} m²</span>` : ''}
+      ${p.cochera ? `<span><i class="fa-solid fa-car"></i> Cochera</span>` : ''}
+      ${p.patio ? `<span><i class="fa-solid fa-tree"></i> Patio</span>` : ''}
+    </div>
+    ${p.owner ? `<div class="item-card-owner"><i class="fa-solid fa-user"></i> Propietario: ${p.owner}</div>` : ''}
+    
+    <div class="card-actions-bottom">
+      <div class="card-actions-left">
+        <button class="btn-delete-item" onclick="deleteProperty(${p.id})"><i class="fa-solid fa-trash"></i></button>
+        <button class="btn-edit-item" onclick="editPropertyForm(${p.id})"><i class="fa-solid fa-pen"></i> Editar</button>
+      </div>
+      ${!mini ? `<button class="btn-match" onclick="runMatching(${p.id})"><i class="fa-solid fa-heart"></i> Buscar matches</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderSearchCard(s) {
+  const notes = clientNotes[s.id] || [];
+  const notePreview = notes.length ? `<div style="font-size:11px;color:var(--gold);margin-top:6px;margin-bottom:6px;"><i class="fa-solid fa-note-sticky"></i> ${notes.length} nota${notes.length>1?'s':''} de seguimiento</div>` : '';
+  return `<div class="search-card">
+    <div class="search-card-top">
+      <div class="search-name">${s.name}</div>
+      <div class="search-date">${s.date || 'Sin fecha'}</div>
+    </div>
+    <div class="item-card-meta" style="margin-top:6px">
+      ${s.op ? `<span class="tag ${opTagClass(s.op)}">${s.op}</span>` : ''}
+      ${s.type ? `<span class="tag tag-type">${s.type}</span>` : ''}
+      ${s.inv ? `<span class="tag tag-inv"><i class="fa-solid fa-chart-line" style="font-size:10px"></i> Inversión</span>` : ''}
+    </div>
+    <div class="search-detail">
+      ${s.zones ? `<i class="fa-solid fa-location-dot"></i> Interés: ${s.zones}<br>` : ''}
+      ${s.budget ? `<i class="fa-solid fa-dollar-sign"></i> Max: ${formatPrice(s.budget, s.currency)}` : ''}
+      ${s.rooms && s.rooms !== 'Cualquiera' ? ` · Min: ${s.rooms} dorm.` : ''}
+      ${s.features ? `<br><i class="fa-solid fa-star"></i> Req: ${s.features}` : ''}
+    </div>
+    ${s.contact ? `<div class="search-contact"><i class="fa-solid fa-phone"></i> ${s.contact}</div>` : ''}
+    ${notePreview}
+    
+    <div class="card-actions-bottom">
+      <div class="card-actions-left">
+        <button class="btn-delete-item" onclick="deleteSearch(${s.id})"><i class="fa-solid fa-trash"></i></button>
+        <button class="btn-edit-item" onclick="editSearchForm(${s.id})"><i class="fa-solid fa-pen"></i> Editar</button>
+      </div>
+      <button class="btn-view-client" onclick="openClientModal(${s.id})"><i class="fa-solid fa-note-sticky"></i> Historial</button>
+    </div>
+  </div>`;
+}
+
+function renderAll() {
+  document.getElementById('props-list').innerHTML = properties.map(p => renderPropCard(p)).join('');
+  document.getElementById('searches-list').innerHTML = searches.map(s => renderSearchCard(s)).join('');
+  document.getElementById('dashboard-recent').innerHTML = properties.slice(-4).reverse().map(p => renderPropCard(p, true)).join('');
+  
+  document.getElementById('stat-props').textContent = properties.length;
+  document.getElementById('stat-searches').textContent = searches.length;
+  document.getElementById('stat-venta').textContent = properties.filter(p => p.op === 'Venta').length;
+  
+  let totalPropsWithMatches = 0;
+  properties.forEach(p => {
+    let matchesViables = searches.filter(s => calculateLocalScore(p, s) === 'alto' || calculateLocalScore(p, s) === 'medio');
+    if(matchesViables.length > 0) totalPropsWithMatches++;
+  });
+  document.getElementById('stat-matches').textContent = totalPropsWithMatches;
+
+  document.getElementById('nb-props').textContent = properties.length;
+  document.getElementById('nb-searches').textContent = searches.length;
+  document.getElementById('nb-matches').textContent = totalPropsWithMatches;
+}
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  document.getElementById('panel-' + id).classList.add('active');
+  const targetNav = document.getElementById('btn-nav-' + id);
+  if(targetNav) targetNav.classList.add('active');
+}
+
+// Lógica del matching algorítmico
+function calculateLocalScore(prop, search) {
+  if (search.op && search.op !== "Cualquiera" && search.op.toLowerCase() !== prop.op.toLowerCase()) return 'incompatible';
+
+  let propZoneClean = prop.zone.toLowerCase().trim();
+  if (propZoneClean.includes("agote") || propZoneClean.includes("san nicolas")) propZoneClean = "agote san nicolas";
+
+  let searchZonesClean = search.zones.toLowerCase();
+  if (searchZonesClean.includes("agote") || searchZonesClean.includes("san nicolas")) searchZonesClean += " agote san nicolas";
+
+  let matchZona = false;
+  if (!search.zones) matchZona = true;
+  else {
+    const arrZonasCliente = searchZonesClean.split(',').map(z => z.trim());
+    arrZonasCliente.forEach(zona => {
+      if (propZoneClean.includes(zona) || zona.includes(propZoneClean)) matchZona = true;
+    });
+  }
+
+  let matchPrecio = false;
+  if (!search.budget || !prop.price) matchPrecio = true;
+  else if (search.currency === prop.currency) {
+    if (Number(prop.price) <= Number(search.budget) * 1.15) matchPrecio = true;
+  }
+
+  let matchTipo = false;
+  if (!search.type || search.type.toLowerCase() === 'cualquiera') matchTipo = true;
+  else {
+    const tiposCliente = search.type.toLowerCase().split(',').map(t => t.trim());
+    tiposCliente.forEach(t => {
+      if (prop.type.toLowerCase().includes(t) || t.includes(prop.type.toLowerCase())) matchTipo = true;
+    });
+  }
+
+  let matchDormis = true;
+  if (search.rooms && search.rooms !== "Cualquiera" && prop.rooms) {
+    if (Number(prop.rooms) < Number(search.rooms)) matchDormis = false;
+  }
+
+  if (!matchZona || !matchDormis) return 'incompatible';
+  if (matchZona && matchPrecio && matchTipo && matchDormis) {
+    if((search.patio && !prop.patio) || (search.cochera && !prop.cochera)) return 'medio';
+    return 'alto';
+  }
+  if (matchZona && (matchPrecio || matchTipo)) return 'medio';
+  return 'incompatible';
+}
+
+function runMatching(propId) {
+  const prop = properties.find(p => p.id === propId);
+  if (!prop) return;
+
+  showPanel('matches');
+  const container = document.getElementById('matches-list');
+  container.innerHTML = '';
+
+  let viableMatches = [];
+  searches.forEach(search => {
+    const score = calculateLocalScore(prop, search);
+    if (score === 'alto' || score === 'medio') {
+      let reason = score === 'alto' ? `Coincidencia ideal en ${prop.zone}.` : `Zona compatible. Evaluar precio/tipología.`;
+      viableMatches.push({ search, score, reason });
+    }
+  });
+
+  viableMatches.sort((a,b) => (a.score === 'alto' ? -1 : 1));
+
+  let html = `<div class="match-result-card">
+    <div class="match-result-header">
+      <div>
+        <div class="prop-name">${prop.addr}</div>
+        <div class="prop-meta">${prop.type} · ${prop.op} · ${prop.zone} · ${formatPrice(prop.price, prop.currency)}</div>
+      </div>
+      <span class="match-count-badge">${viableMatches.length} match${viableMatches.length !== 1 ? 'es' : ''}</span>
+    </div>`;
+
+  if (viableMatches.length > 0) {
+    html += `<div class="match-entries">`;
+    viableMatches.forEach(m => {
+      const scClass = m.score === 'alto' ? 'score-alto' : 'score-medio';
+      html += `<div class="match-entry">
+        <div class="match-entry-left">
+          <div class="name">${m.search.name}</div>
+          <div class="reason">${m.reason}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button class="btn-view-client" onclick="openClientModal(${m.search.id})" style="padding:4px 8px;">Ficha</button>
+          <span class="score-badge ${scClass}">${m.score}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  } else {
+    html += `<div class="match-loading" style="animation:none"><p>No se encontraron clientes compatibles para esta propiedad.</p></div>`;
+  }
+  container.innerHTML = html;
+}
+
+// CARGA DE DATOS PARA EDICIÓN DE PROPIEDAD
+function editPropertyForm(id) {
+  const p = properties.find(x => x.id === id);
+  if(!p) return;
+  
+  document.getElementById('np-id').value = p.id;
+  document.getElementById('np-addr').value = p.addr;
+  document.getElementById('np-zone').value = p.zone;
+  document.getElementById('np-type').value = p.type;
+  document.getElementById('np-op').value = p.op;
+  document.getElementById('np-price').value = p.price;
+  document.getElementById('np-currency').value = p.currency || 'USD';
+  document.getElementById('np-sqm').value = p.sqm || '';
+  document.getElementById('np-rooms').value = p.rooms || '';
+  document.getElementById('np-owner').value = p.owner || '';
+  document.getElementById('np-amenities').value = p.amenities || '';
+  document.getElementById('np-cochera').checked = !!p.cochera;
+  document.getElementById('np-patio').checked = !!p.patio;
+  document.getElementById('np-credito').checked = !!p.credito;
+  document.getElementById('np-desc').value = p.desc || '';
+  
+  document.getElementById('form-prop-title').textContent = "Editar propiedad";
+  document.getElementById('form-prop-sub').textContent = `Modificando la ficha de: ${p.addr}`;
+  document.getElementById('btn-prop-text').textContent = "Guardar Cambios";
+  
+  showPanel('nueva-prop');
+}
+
+// GUARDAR / ACTUALIZAR PROPIEDAD
+function saveProperty() {
+  const id = document.getElementById('np-id').value;
+  const addr = document.getElementById('np-addr').value.trim();
+  const type = document.getElementById('np-type').value;
+  const op = document.getElementById('np-op').value;
+  const price = document.getElementById('np-price').value.trim();
+  const currency = document.getElementById('np-currency').value;
+  const zone = document.getElementById('np-zone').value.trim();
+
+  if (!addr || !type || !op || !price || !zone) { 
+    alert('Completá los datos obligatorios: Dirección, Barrio, Tipo, Operación y Precio.'); 
+    return; 
+  }
+
+  const pData = {
+    type, op, addr, zone,
+    price: Number(price), currency,
+    sqm: document.getElementById('np-sqm').value || null,
+    rooms: document.getElementById('np-rooms').value,
+    cochera: document.getElementById('np-cochera').checked,
+    patio: document.getElementById('np-patio').checked,
+    credito: document.getElementById('np-credito').checked,
+    amenities: document.getElementById('np-amenities').value.trim(),
+    owner: document.getElementById('np-owner').value.trim(),
+    desc: document.getElementById('np-desc').value.trim(),
+  };
+
+  if (id) {
+    // Modo Edición
+    const idx = properties.findIndex(x => x.id == id);
+    if(idx !== -1) {
+      properties[idx] = { ...properties[idx], ...pData };
+    }
+  } else {
+    // Modo Alta Nueva
+    pData.id = Date.now();
+    properties.unshift(pData);
+  }
+
+  saveData();
+  renderAll();
+  const activeId = id ? id : pData.id;
+  clearNewProp();
+  showPanel('propiedades');
+  runMatching(Number(activeId));
+}
+
+// CARGA DE DATOS PARA EDICIÓN DE BÚSQUEDA
+function editSearchForm(id) {
+  const s = searches.find(x => x.id === id);
+  if(!s) return;
+
+  document.getElementById('ns-id').value = s.id;
+  document.getElementById('ns-name').value = s.name;
+  document.getElementById('ns-contact').value = s.contact || '';
+  document.getElementById('ns-captura').value = s.captura || '';
+  document.getElementById('ns-op').value = s.op || 'Cualquiera';
+  document.getElementById('ns-type').value = s.type || '';
+  document.getElementById('ns-zones').value = s.zones;
+  document.getElementById('ns-budget').value = s.budget;
+  document.getElementById('ns-currency').value = s.currency || 'USD';
+  document.getElementById('ns-rooms').value = s.rooms || 'Cualquiera';
+  document.getElementById('ns-features').value = s.features || '';
+  document.getElementById('ns-patio').checked = !!s.patio;
+  document.getElementById('ns-cochera').checked = !!s.cochera;
+  document.getElementById('ns-inv').checked = !!s.inv;
+  document.getElementById('ns-notes').value = s.notes || '';
+
+  document.getElementById('form-search-title').textContent = "Editar búsqueda";
+  document.getElementById('form-search-sub').textContent = `Modificando los requisitos de: ${s.name}`;
+  document.getElementById('btn-search-text').textContent = "Guardar Cambios";
+
+  showPanel('nueva-busqueda');
+}
+
+// GUARDAR / ACTUALIZAR BÚSQUEDA
+function saveSearch() {
+  const id = document.getElementById('ns-id').value;
+  const name = document.getElementById('ns-name').value.trim();
+  const zones = document.getElementById('ns-zones').value.trim();
+  const budget = document.getElementById('ns-budget').value.trim();
+  const currency = document.getElementById('ns-currency').value;
+
+  if (!name || !zones || !budget) { 
+    alert('Ingresá los datos mínimos: Nombre, Zonas y Presupuesto.'); 
+    return; 
+  }
+
+  const sData = {
+    name, zones, budget: Number(budget), currency,
+    contact: document.getElementById('ns-contact').value.trim(),
+    captura: document.getElementById('ns-captura').value,
+    op: document.getElementById('ns-op').value,
+    type: document.getElementById('ns-type').value.trim() || 'Cualquiera',
+    rooms: document.getElementById('ns-rooms').value,
+    features: document.getElementById('ns-features').value.trim(),
+    patio: document.getElementById('ns-patio').checked,
+    cochera: document.getElementById('ns-cochera').checked,
+    inv: document.getElementById('ns-inv').checked,
+    notes: document.getElementById('ns-notes').value.trim(),
+  };
+
+  if (id) {
+    // Modo Edición
+    const idx = searches.findIndex(x => x.id == id);
+    if(idx !== -1) {
+      searches[idx] = { ...searches[idx], ...sData };
+    }
+  } else {
+    // Modo Alta Nueva
+    sData.id = Date.now();
+    sData.date = new Date().toLocaleDateString('es-AR');
+    searches.unshift(sData);
+    if(sData.notes) {
+      clientNotes[sData.id] = [{ text: sData.notes, date: sData.date }];
+    }
+  }
+
+  saveData();
+  renderAll();
+  clearNewSearch();
+  showPanel('busquedas');
+}
+
+// Borrados
+function deleteProperty(id) {
+  if(confirm("¿Eliminar esta propiedad?")) {
+    properties = properties.filter(p => p.id !== id);
+    saveData();
+    renderAll();
+  }
+}
+
+function deleteSearch(id) {
+  if(confirm("¿Eliminar este cliente y su búsqueda?")) {
+    searches = searches.filter(s => s.id !== id);
+    delete clientNotes[id];
+    saveData();
+    renderAll();
+  }
+}
+
+// Reseteos de formularios
+function clearNewProp() {
+  document.getElementById('np-id').value = '';
+  ['np-addr','np-zone','np-type','np-op','np-price','np-sqm','np-rooms','np-owner','np-amenities','np-desc'].forEach(id => { document.getElementById(id).value = ''; });
+  ['np-cochera','np-patio','np-credito'].forEach(id => { document.getElementById(id).checked = false; });
+  
+  document.getElementById('form-prop-title').textContent = "Nueva propiedad";
+  document.getElementById('form-prop-sub').textContent = "Cargá una propiedad en la base de datos";
+  document.getElementById('btn-prop-text').textContent = "Guardar Propiedad";
+}
+
+function clearNewSearch() {
+  document.getElementById('ns-id').value = '';
+  ['ns-name','ns-contact','ns-date','ns-captura','ns-op','ns-type','ns-zones','ns-budget','ns-features','ns-notes'].forEach(id => { document.getElementById(id).value = ''; });
+  ['ns-patio','ns-cochera','ns-inv'].forEach(id => { document.getElementById(id).checked = false; });
+  
+  document.getElementById('form-search-title').textContent = "Nueva búsqueda";
+  document.getElementById('form-search-sub').textContent = "Registrá los requisitos de un cliente";
+  document.getElementById('btn-search-text').textContent = "Guardar búsqueda";
+}
+
+// Gestión del modal de notas
+function openClientModal(searchId) {
+  const s = searches.find(x => x.id === searchId);
+  if (!s) return;
+  activeClientId = searchId;
+  document.getElementById('modal-name').textContent = s.name;
+  document.getElementById('modal-date').textContent = "Ingreso: " + (s.date || '') + (s.captura ? ' · Canal: ' + s.captura : '');
+
+  const tags = document.getElementById('modal-tags');
+  tags.innerHTML = [
+    s.op ? `<span class="tag ${opTagClass(s.op)}">${s.op}</span>` : '',
+    s.type ? `<span class="tag tag-type">${s.type}</span>` : '',
+    s.inv ? `<span class="tag tag-inv">Inversión</span>` : '',
+    s.patio ? `<span class="tag tag-zone">Requiere Patio</span>` : '',
+    s.cochera ? `<span class="tag tag-zone">Requiere Cochera</span>` : '',
+  ].filter(Boolean).join('');
+
+  const details = [
+    s.zones ? `<i class="fa-solid fa-location-dot" style="color:var(--accent);margin-right:4px"></i> <b>Barrios:</b> ${s.zones}` : '',
+    s.budget ? `<i class="fa-solid fa-dollar-sign" style="color:var(--accent);margin-right:4px"></i> <b>Presupuesto:</b> ${formatPrice(s.budget, s.currency)}` : '',
+    s.rooms && s.rooms !== 'Cualquiera' ? `<i class="fa-solid fa-bed" style="color:var(--accent);margin-right:4px"></i> <b>Mínimo:</b> ${s.rooms} dorm.` : '',
+    s.features ? `<i class="fa-solid fa-star" style="color:var(--gold);margin-right:4px"></i> <b>Filtros clave:</b> ${s.features}` : '',
+  ].filter(Boolean).join('<br>');
+  document.getElementById('modal-detail').innerHTML = details || '—';
+
+  const cw = document.getElementById('modal-contact-wrap');
+  if (s.contact) { cw.style.display = 'block'; document.getElementById('modal-contact').textContent = s.contact; }
+  else cw.style.display = 'none';
+
+  renderModalNotes();
+  document.getElementById('client-modal').classList.add('open');
+  document.getElementById('modal-note-input').focus();
+}
+
+function renderModalNotes() {
+  const notes = clientNotes[activeClientId] || [];
+  const list = document.getElementById('modal-notes-list');
+  document.getElementById('modal-notes-count').textContent = notes.length ? `(${notes.length})` : '';
+  if (notes.length === 0) { 
+    list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 0">No hay eventos de seguimiento para este cliente.</div>'; 
+    return; 
+  }
+  list.innerHTML = notes.map((n, i) => `
+    <div class="note-item">
+      <div class="note-item-text">${n.text}</div>
+      <div class="note-item-meta">${n.date}</div>
+      <button class="note-delete" onclick="deleteNoteAndRefresh(${i})"><i class="fa-solid fa-xmark"></i></button>
+    </div>`).join('');
+}
+
+function saveModalNote() {
+  const input = document.getElementById('modal-note-input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  if (!clientNotes[activeClientId]) clientNotes[activeClientId] = [];
+  const timestamp = new Date().toLocaleDateString('es-AR', { day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit' });
+  
+  clientNotes[activeClientId].unshift({ text, date: timestamp });
+  saveData();
+  input.value = '';
+  renderModalNotes();
+  renderAll();
+}
+
+function deleteNoteAndRefresh(idx) {
+  if(clientNotes[activeClientId]) {
+    clientNotes[activeClientId].splice(idx, 1);
+    saveData();
+    renderModalNotes();
+    renderAll();
+  }
+}
+
+function closeModal() {
+  document.getElementById('client-modal').classList.remove('open');
+  activeClientId = null;
+}
+
+function exportClientWA() {
+  const s = searches.find(x => x.id === activeClientId);
+  if (!s) return;
+  const notes = clientNotes[activeClientId] || [];
+  let msg = `*DFD Propiedades — Ficha de Cliente*\n\n`;
+  msg += `👤 *Nombre:* ${s.name}\n`;
+  if (s.contact) msg += `📞 *Contacto:* ${s.contact}\n`;
+  msg += `\n🎯 *Requisitos de Búsqueda:*\n`;
+  msg += `• Operación: ${s.op}\n`;
+  msg += `• Tipos: ${s.type}\n`;
+  msg += `• Zonas: ${s.zones}\n`;
+  msg += `• Presupuesto Máx: ${formatPrice(s.budget, s.currency)}\n`;
+  if (notes.length) {
+    msg += `\n📝 *Historial de Seguimiento:*\n`;
+    notes.forEach(n => msg += `• [${n.date}] ${n.text}\n`);
+  }
+  
+  navigator.clipboard.writeText(msg).then(() => alert('✅ ¡Ficha copiada!')).catch(() => alert(msg));
+}
+
+// Ejecutar render inicial
+renderAll();
+</script>
+</body>
+</html>
