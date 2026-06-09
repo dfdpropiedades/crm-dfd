@@ -253,7 +253,8 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
       <div class="section-card">
         <div class="section-title"><i class="fa-solid fa-building"></i> Datos de la propiedad</div>
-        <input type="hidden" id="np-id"> <div class="form-grid">
+        <input type="hidden" id="np-id"> 
+        <div class="form-grid">
           <div class="form-group"><label>Dirección</label><input id="np-addr" placeholder="Ej: Mendoza 1234"></div>
           <div class="form-group"><label>Barrio / Zona</label><input id="np-zone" placeholder="Ej: Centro, Arroyito, Echesortu"></div>
           <div class="form-group"><label>Tipo</label>
@@ -293,7 +294,8 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
       <div class="section-card">
         <div class="section-title"><i class="fa-solid fa-magnifying-glass"></i> Datos del cliente</div>
-        <input type="hidden" id="ns-id"> <div class="form-grid">
+        <input type="hidden" id="ns-id"> 
+        <div class="form-grid">
           <div class="form-group"><label>Nombre del cliente</label><input id="ns-name" placeholder="Nombre completo"></div>
           <div class="form-group"><label>Contacto (tel / email)</label><input id="ns-contact" placeholder="341-555-5555"></div>
           <div class="form-group"><label>Fecha</label><input id="ns-date" type="date"></div>
@@ -439,8 +441,8 @@ async function fetchAllData() {
       .select('*')
       .order('id', { ascending: false });
       
+    clientNotes = {};
     if (!notesErr && notesData) {
-      clientNotes = {};
       notesData.forEach(n => {
         if (!clientNotes[n.cliente_id]) clientNotes[n.cliente_id] = [];
         clientNotes[n.cliente_id].push({
@@ -748,11 +750,9 @@ async function saveProperty() {
 
   try {
     if (id) {
-      // Editar registro existente
       const { error } = await supabase.from('Propiedades').update(payload).eq('id', id);
       if (error) throw error;
     } else {
-      // Insertar nuevo registro
       const { error } = await supabase.from('Propiedades').insert([payload]);
       if (error) throw error;
     }
@@ -797,15 +797,12 @@ async function saveSearch() {
 
   try {
     if (id) {
-      // Editar cliente
       const { error } = await supabase.from('Clientes').update(payload).eq('id', id);
       if (error) throw error;
     } else {
-      // Insertar nuevo cliente
       const { data, error } = await supabase.from('Clientes').insert([payload]).select();
       if (error) throw error;
 
-      // Si cargaste una nota inicial, la linkeamos automáticamente en la tabla de seguimiento
       if (payload.Notas_iniciales && data && data[0]) {
         await supabase.from('Notas_Seguimiento').insert([{
           cliente_id: data[0].id,
@@ -839,9 +836,7 @@ async function deleteProperty(id) {
 async function deleteSearch(id) {
   if(confirm("¿Eliminar este cliente y todo su historial de notas?")) {
     try {
-      // Primero borramos las notas asociadas por integridad relacional
       await supabase.from('Notas_Seguimiento').delete().eq('cliente_id', id);
-      // Luego borramos el cliente
       const { error } = await supabase.from('Clientes').delete().eq('id', id);
       if (error) throw error;
       await fetchAllData();
@@ -902,6 +897,7 @@ function openClientModal(searchId) {
   else cw.style.display = 'none';
 
   renderModalNotes();
+  document.getElementById('client-modal').open = true; // Forzar render
   document.getElementById('client-modal').classList.add('open');
   document.getElementById('modal-note-input').focus();
 }
