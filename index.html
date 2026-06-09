@@ -8,28 +8,37 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root {
-  --bg: #F5F2EE;
-  --bg2: #EDEAE4;
+  --bg: #F3F7F4;
+  --bg2: #E3ECE5;
   --surface: #FFFFFF;
-  --border: #D8D2C8;
-  --text: #1A1714;
-  --muted: #7A746C;
-  --accent: #C4531A;
-  --accent2: #8B3A12;
+  --border: #C9D8CC;
+
+  --text: #123222;
+  --muted: #5E7464;
+
+  /* VERDE DFD */
+  --accent: #0F6B3A;
+  --accent2: #0A4F2B;
+
   --gold: #B8922A;
-  --green: #2A6B3C;
-  --blue: #1E4E7A;
-  --purple: #5A3A7A;
+  --green: #0F6B3A;
+  --blue: #2D6A4F;
+  --purple: #3D5A40;
+
   --r: 10px;
   --r-sm: 6px;
-  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+
+  --shadow: 0 1px 3px rgba(0,0,0,0.08),
+             0 4px 16px rgba(0,0,0,0.06);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
 /* LAYOUT */
 .app-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
-.sidebar { background: var(--text); color: #F5F2EE; padding: 0; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar {
+  background: #0B2A1B;
+}
 .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .sidebar-logo .brand { font-family: 'DM Serif Display', serif; font-size: 20px; line-height: 1.2; color: #fff; }
 .sidebar-logo .sub { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
@@ -57,7 +66,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 20px; }
 .stat-num { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); line-height: 1; }
 .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-.stat-card.accent { background: var(--accent); border-color: var(--accent); }
+.stat-card.accent {
+  background: linear-gradient(135deg, #0F6B3A, #0A4F2B);
+  border-color: #0F6B3A;
+}
 .stat-card.accent .stat-num, .stat-card.accent .stat-label { color: #fff; }
 .stat-card.accent .stat-label { opacity: 0.8; }
 
