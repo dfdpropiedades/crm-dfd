@@ -188,7 +188,6 @@ textarea { resize: vertical; min-height: 70px; }
 
   <main class="main">
 
-    <!-- DASHBOARD -->
     <div id="panel-dashboard" class="panel active">
       <div class="page-header">
         <div class="page-title">Dashboard</div>
@@ -218,7 +217,6 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
     </div>
 
-    <!-- PROPIEDADES -->
     <div id="panel-propiedades" class="panel">
       <div class="page-header">
         <div class="page-title">Propiedades</div>
@@ -227,7 +225,6 @@ textarea { resize: vertical; min-height: 70px; }
       <div class="cards-grid" id="props-list"></div>
     </div>
 
-    <!-- BÚSQUEDAS -->
     <div id="panel-busquedas" class="panel">
       <div class="page-header">
         <div class="page-title">Búsquedas activas</div>
@@ -236,7 +233,6 @@ textarea { resize: vertical; min-height: 70px; }
       <div class="cards-grid" id="searches-list"></div>
     </div>
 
-    <!-- MATCHES -->
     <div id="panel-matches" class="panel">
       <div class="page-header">
         <div class="page-title">Matches de la Propiedad</div>
@@ -250,7 +246,6 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
     </div>
 
-    <!-- FORMULARIO PROPIEDAD (ALTA Y EDICIÓN) -->
     <div id="panel-nueva-prop" class="panel">
       <div class="page-header">
         <div class="page-title" id="form-prop-title">Nueva propiedad</div>
@@ -258,8 +253,7 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
       <div class="section-card">
         <div class="section-title"><i class="fa-solid fa-building"></i> Datos de la propiedad</div>
-        <input type="hidden" id="np-id"> <!-- ID Oculto para identificar si es edición -->
-        <div class="form-grid">
+        <input type="hidden" id="np-id"> <div class="form-grid">
           <div class="form-group"><label>Dirección</label><input id="np-addr" placeholder="Ej: Mendoza 1234"></div>
           <div class="form-group"><label>Barrio / Zona</label><input id="np-zone" placeholder="Ej: Centro, Arroyito, Echesortu"></div>
           <div class="form-group"><label>Tipo</label>
@@ -292,7 +286,6 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
     </div>
 
-    <!-- FORMULARIO BÚSQUEDA (ALTA Y EDICIÓN) -->
     <div id="panel-nueva-busqueda" class="panel">
       <div class="page-header">
         <div class="page-title" id="form-search-title">Nueva búsqueda</div>
@@ -300,8 +293,7 @@ textarea { resize: vertical; min-height: 70px; }
       </div>
       <div class="section-card">
         <div class="section-title"><i class="fa-solid fa-magnifying-glass"></i> Datos del cliente</div>
-        <input type="hidden" id="ns-id"> <!-- ID Oculto para identificar si es edición -->
-        <div class="form-grid">
+        <input type="hidden" id="ns-id"> <div class="form-grid">
           <div class="form-group"><label>Nombre del cliente</label><input id="ns-name" placeholder="Nombre completo"></div>
           <div class="form-group"><label>Contacto (tel / email)</label><input id="ns-contact" placeholder="341-555-5555"></div>
           <div class="form-group"><label>Fecha</label><input id="ns-date" type="date"></div>
@@ -338,7 +330,6 @@ textarea { resize: vertical; min-height: 70px; }
   </main>
 </div>
 
-<!-- MODAL CLIENTE -->
 <div class="modal-overlay" id="client-modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
@@ -373,31 +364,97 @@ textarea { resize: vertical; min-height: 70px; }
   </div>
 </div>
 
-<script>
-// Datos semilla por defecto
-const DEFAULT_SEARCHES = [
-  { id:1, date:"12/05/2026", name:"Majo Andretta", captura:"Web", op:"Venta", type:"Casa", zones:"Echesortu, Lourdes, Agote, San Nicolas", rooms:"2", budget:90000, currency:"USD", features:"Apto crédito", patio:true, cochera:true, inv:false, contact:"", notes:"" },
-  { id:2, date:"12/05/2026", name:"Jorge", captura:"Contacto", op:"Venta", type:"Local, Casa, Depto", zones:"Centro", rooms:"Cualquiera", budget:65000, currency:"USD", features:"Inversión", patio:false, cochera:false, inv:true, contact:"", notes:"" },
-  { id:3, date:"21/05/2026", name:"Marina bv ronde", captura:"Contacto", op:"Alquiler", type:"Depto", zones:"Alberdi, Arroyito", rooms:"1", budget:600000, currency:"ARS", features:"Inversión", patio:false, cochera:false, inv:true, contact:"", notes:"" },
-  { id:8, date:"05/06/2026", name:"Romina", captura:"Instagram", op:"Venta", type:"Depto pasillo, Depto", zones:"Centro", rooms:"1", budget:60000, currency:"USD", features:"Patio o balcón", patio:true, cochera:false, inv:false, contact:"54 9 3416 91-0113", notes:"" }
-];
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-const DEFAULT_PROPERTIES = [
-  { id:1, type:"Casa", op:"Venta", addr:"Superi 446", zone:"Alberdi", sqm:454, price:400000, currency:"USD", rooms:"3", banos:"4", cochera:true, patio:true, credito:false, amenities:"", owner:"DFD", desc:"Casa grande en Alberdi, 3 dormitorios." },
-  { id:7, type:"Depto", op:"Venta", addr:"San Nicolas 200", zone:"Luis Agote", sqm:57, price:62000, currency:"USD", rooms:"2", banos:"1", cochera:false, patio:false, credito:false, amenities:"", owner:"", desc:"Depto en zona Agote." },
-  { id:15, type:"Depto", op:"Venta", addr:"San Luis 2227", zone:"Centro", sqm:50, price:70000, currency:"USD", rooms:"1", banos:"1", cochera:false, patio:true, credito:true, amenities:"", owner:"DFD", desc:"Excelente para inversores en Centro." }
-];
+const SUPABASE_URL = 'https://ivovuemwpczuiszjpaxh.supabase.co' 
+const SUPABASE_ANON_KEY = 'sb_publishable_oEhi6qpIs3cZg-fVEUKsug_aVwsfGZc'
 
-// Inicialización de bases de datos
-let properties = JSON.parse(localStorage.getItem('dfd_properties')) || DEFAULT_PROPERTIES;
-let searches = JSON.parse(localStorage.getItem('dfd_searches')) || DEFAULT_SEARCHES;
-let clientNotes = JSON.parse(localStorage.getItem('dfd_notes')) || {};
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// Hacemos que las funciones sean accesibles globalmente desde los onclick del HTML
+window.showPanel = showPanel;
+window.clearNewProp = clearNewProp;
+window.clearNewSearch = clearNewSearch;
+window.saveProperty = saveProperty;
+window.saveSearch = saveSearch;
+window.editPropertyForm = editPropertyForm;
+window.editSearchForm = editSearchForm;
+window.deleteProperty = deleteProperty;
+window.deleteSearch = deleteSearch;
+window.runMatching = runMatching;
+window.openClientModal = openClientModal;
+window.closeModal = closeModal;
+window.saveModalNote = saveModalNote;
+window.deleteNoteAndRefresh = deleteNoteAndRefresh;
+window.exportClientWA = exportClientWA;
+
+// Estados de la app en memoria global
+let properties = [];
+let searches = [];
+let clientNotes = {};
 let activeClientId = null;
 
-function saveData() {
-  localStorage.setItem('dfd_properties', JSON.stringify(properties));
-  localStorage.setItem('dfd_searches', JSON.stringify(searches));
-  localStorage.setItem('dfd_notes', JSON.stringify(clientNotes));
+// CARGAR DATOS INICIALES DESDE SUPABASE AL ABRIR LA WEB
+async function fetchAllData() {
+  try {
+    // 1. Traer Propiedades (ordenadas por ingreso reciente)
+    const { data: propsData, error: propsErr } = await supabase
+      .from('Propiedades')
+      .select('*')
+      .order('id', { ascending: false });
+    if (propsErr) throw propsErr;
+    properties = propsData || [];
+
+    // 2. Traer Búsquedas / Clientes
+    const { data: searchData, error: searchErr } = await supabase
+      .from('Clientes')
+      .select('*')
+      .order('id', { ascending: false });
+    if (searchErr) throw searchErr;
+    
+    // Mapeamos las columnas de Supabase al formato que espera tu frontend actual
+    searches = (searchData || []).map(s => ({
+      id: s.id,
+      date: s.created_at ? new Date(s.created_at).toLocaleDateString('es-AR') : 'Sin fecha',
+      name: s.Nombre,
+      contact: s.Contacto,
+      captura: s.Captacion,
+      op: s.Busqueda_operacion,
+      type: s.Busqueda_tipo || 'Cualquiera',
+      zones: s.Busqueda_zona,
+      budget: s.Presupuesto_max,
+      currency: s.Moneda || 'USD',
+      rooms: s.Dormitorios_min || 'Cualquiera',
+      features: s.Caracteristicas_clave,
+      patio: !!s.Requiere_patio,
+      cochera: !!s.Requiere_cochera,
+      inv: !!s.Es_inversion,
+      notes: s.Notas_iniciales
+    }));
+
+    // 3. Traer Notas de seguimiento globales
+    const { data: notesData, error: notesErr } = await supabase
+      .from('Notas_Seguimiento')
+      .select('*')
+      .order('id', { ascending: false });
+      
+    if (!notesErr && notesData) {
+      clientNotes = {};
+      notesData.forEach(n => {
+        if (!clientNotes[n.cliente_id]) clientNotes[n.cliente_id] = [];
+        clientNotes[n.cliente_id].push({
+          id: n.id,
+          text: n.texto,
+          date: n.fecha_string
+        });
+      });
+    }
+
+    renderAll();
+  } catch (error) {
+    console.error("Error al sincronizar con Supabase:", error.message);
+  }
 }
 
 function opTagClass(op) {
@@ -413,7 +470,7 @@ function formatPrice(price, currency) {
   return (currency === "USD" ? "USD " : "$ ") + Number(price).toLocaleString('es-AR');
 }
 
-// Renders de tarjetas con botón "Editar" añadido
+// Renders visuales de tarjetas
 function renderPropCard(p, mini=false) {
   return `<div class="item-card">
     <div class="item-card-top">
@@ -481,7 +538,7 @@ function renderSearchCard(s) {
 function renderAll() {
   document.getElementById('props-list').innerHTML = properties.map(p => renderPropCard(p)).join('');
   document.getElementById('searches-list').innerHTML = searches.map(s => renderSearchCard(s)).join('');
-  document.getElementById('dashboard-recent').innerHTML = properties.slice(-4).reverse().map(p => renderPropCard(p, true)).join('');
+  document.getElementById('dashboard-recent').innerHTML = properties.slice(0, 4).map(p => renderPropCard(p, true)).join('');
   
   document.getElementById('stat-props').textContent = properties.length;
   document.getElementById('stat-searches').textContent = searches.length;
@@ -508,7 +565,7 @@ function showPanel(id) {
   if(targetNav) targetNav.classList.add('active');
 }
 
-// Lógica del matching algorítmico
+// Algorítmo de cruce Inteligente
 function calculateLocalScore(prop, search) {
   if (search.op && search.op !== "Cualquiera" && search.op.toLowerCase() !== prop.op.toLowerCase()) return 'incompatible';
 
@@ -601,12 +658,12 @@ function runMatching(propId) {
     });
     html += `</div>`;
   } else {
-    html += `<div class="match-loading" style="animation:none"><p>No se encontraron clientes compatibles para esta propiedad.</p></div>`;
+    html += `<div class="match-loading" style="animation:none; text-align:center; padding:30px; color:var(--muted);"><p>No se encontraron clientes compatibles para esta propiedad.</p></div>`;
   }
   container.innerHTML = html;
 }
 
-// CARGA DE DATOS PARA EDICIÓN DE PROPIEDAD
+// FORMULARIOS DE EDICIÓN (PRE-CARGA)
 function editPropertyForm(id) {
   const p = properties.find(x => x.id === id);
   if(!p) return;
@@ -634,55 +691,6 @@ function editPropertyForm(id) {
   showPanel('nueva-prop');
 }
 
-// GUARDAR / ACTUALIZAR PROPIEDAD
-function saveProperty() {
-  const id = document.getElementById('np-id').value;
-  const addr = document.getElementById('np-addr').value.trim();
-  const type = document.getElementById('np-type').value;
-  const op = document.getElementById('np-op').value;
-  const price = document.getElementById('np-price').value.trim();
-  const currency = document.getElementById('np-currency').value;
-  const zone = document.getElementById('np-zone').value.trim();
-
-  if (!addr || !type || !op || !price || !zone) { 
-    alert('Completá los datos obligatorios: Dirección, Barrio, Tipo, Operación y Precio.'); 
-    return; 
-  }
-
-  const pData = {
-    type, op, addr, zone,
-    price: Number(price), currency,
-    sqm: document.getElementById('np-sqm').value || null,
-    rooms: document.getElementById('np-rooms').value,
-    cochera: document.getElementById('np-cochera').checked,
-    patio: document.getElementById('np-patio').checked,
-    credito: document.getElementById('np-credito').checked,
-    amenities: document.getElementById('np-amenities').value.trim(),
-    owner: document.getElementById('np-owner').value.trim(),
-    desc: document.getElementById('np-desc').value.trim(),
-  };
-
-  if (id) {
-    // Modo Edición
-    const idx = properties.findIndex(x => x.id == id);
-    if(idx !== -1) {
-      properties[idx] = { ...properties[idx], ...pData };
-    }
-  } else {
-    // Modo Alta Nueva
-    pData.id = Date.now();
-    properties.unshift(pData);
-  }
-
-  saveData();
-  renderAll();
-  const activeId = id ? id : pData.id;
-  clearNewProp();
-  showPanel('propiedades');
-  runMatching(Number(activeId));
-}
-
-// CARGA DE DATOS PARA EDICIÓN DE BÚSQUEDA
 function editSearchForm(id) {
   const s = searches.find(x => x.id === id);
   if(!s) return;
@@ -710,8 +718,55 @@ function editSearchForm(id) {
   showPanel('nueva-busqueda');
 }
 
-// GUARDAR / ACTUALIZAR BÚSQUEDA
-function saveSearch() {
+// PERSISTENCIA: GUARDAR PROPIEDAD EN SUPABASE
+async function saveProperty() {
+  const id = document.getElementById('np-id').value;
+  const addr = document.getElementById('np-addr').value.trim();
+  const type = document.getElementById('np-type').value;
+  const op = document.getElementById('np-op').value;
+  const price = document.getElementById('np-price').value.trim();
+  const currency = document.getElementById('np-currency').value;
+  const zone = document.getElementById('np-zone').value.trim();
+
+  if (!addr || !type || !op || !price || !zone) { 
+    alert('Completá los datos obligatorios: Dirección, Barrio, Tipo, Operación y Precio.'); 
+    return; 
+  }
+
+  const payload = {
+    addr, zone, type, op, 
+    price: Number(price), currency,
+    sqm: document.getElementById('np-sqm').value ? Number(document.getElementById('np-sqm').value) : null,
+    rooms: document.getElementById('np-rooms').value,
+    owner: document.getElementById('np-owner').value.trim(),
+    amenities: document.getElementById('np-amenities').value.trim(),
+    cochera: document.getElementById('np-cochera').checked,
+    patio: document.getElementById('np-patio').checked,
+    credito: document.getElementById('np-credito').checked,
+    desc: document.getElementById('np-desc').value.trim()
+  };
+
+  try {
+    if (id) {
+      // Editar registro existente
+      const { error } = await supabase.from('Propiedades').update(payload).eq('id', id);
+      if (error) throw error;
+    } else {
+      // Insertar nuevo registro
+      const { error } = await supabase.from('Propiedades').insert([payload]);
+      if (error) throw error;
+    }
+    
+    clearNewProp();
+    await fetchAllData();
+    showPanel('propiedades');
+  } catch (err) {
+    alert('Error al guardar propiedad: ' + err.message);
+  }
+}
+
+// PERSISTENCIA: GUARDAR CLIENTE / BÚSQUEDA EN SUPABASE
+async function saveSearch() {
   const id = document.getElementById('ns-id').value;
   const name = document.getElementById('ns-name').value.trim();
   const zones = document.getElementById('ns-zones').value.trim();
@@ -723,61 +778,80 @@ function saveSearch() {
     return; 
   }
 
-  const sData = {
-    name, zones, budget: Number(budget), currency,
-    contact: document.getElementById('ns-contact').value.trim(),
-    captura: document.getElementById('ns-captura').value,
-    op: document.getElementById('ns-op').value,
-    type: document.getElementById('ns-type').value.trim() || 'Cualquiera',
-    rooms: document.getElementById('ns-rooms').value,
-    features: document.getElementById('ns-features').value.trim(),
-    patio: document.getElementById('ns-patio').checked,
-    cochera: document.getElementById('ns-cochera').checked,
-    inv: document.getElementById('ns-inv').checked,
-    notes: document.getElementById('ns-notes').value.trim(),
+  const payload = {
+    Nombre: name,
+    Contacto: document.getElementById('ns-contact').value.trim(),
+    Captacion: document.getElementById('ns-captura').value,
+    Busqueda_operacion: document.getElementById('ns-op').value,
+    Busqueda_tipo: document.getElementById('ns-type').value.trim(),
+    Busqueda_zona: zones,
+    Presupuesto_max: Number(budget),
+    Moneda: currency,
+    Dormitorios_min: document.getElementById('ns-rooms').value,
+    Caracteristicas_clave: document.getElementById('ns-features').value.trim(),
+    Requiere_patio: document.getElementById('ns-patio').checked,
+    Requiere_cochera: document.getElementById('ns-cochera').checked,
+    Es_inversion: document.getElementById('ns-inv').checked,
+    Notas_iniciales: document.getElementById('ns-notes').value.trim()
   };
 
-  if (id) {
-    // Modo Edición
-    const idx = searches.findIndex(x => x.id == id);
-    if(idx !== -1) {
-      searches[idx] = { ...searches[idx], ...sData };
+  try {
+    if (id) {
+      // Editar cliente
+      const { error } = await supabase.from('Clientes').update(payload).eq('id', id);
+      if (error) throw error;
+    } else {
+      // Insertar nuevo cliente
+      const { data, error } = await supabase.from('Clientes').insert([payload]).select();
+      if (error) throw error;
+
+      // Si cargaste una nota inicial, la linkeamos automáticamente en la tabla de seguimiento
+      if (payload.Notas_iniciales && data && data[0]) {
+        await supabase.from('Notas_Seguimiento').insert([{
+          cliente_id: data[0].id,
+          texto: payload.Notas_iniciales,
+          fecha_string: new Date().toLocaleDateString('es-AR') + ' ' + new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'})
+        }]);
+      }
     }
-  } else {
-    // Modo Alta Nueva
-    sData.id = Date.now();
-    sData.date = new Date().toLocaleDateString('es-AR');
-    searches.unshift(sData);
-    if(sData.notes) {
-      clientNotes[sData.id] = [{ text: sData.notes, date: sData.date }];
+    
+    clearNewSearch();
+    await fetchAllData();
+    showPanel('busquedas');
+  } catch (err) {
+    alert('Error al guardar cliente: ' + err.message);
+  }
+}
+
+// ELIMINAR REGISTROS
+async function deleteProperty(id) {
+  if(confirm("¿Eliminar esta propiedad definitivamente de Supabase?")) {
+    try {
+      const { error } = await supabase.from('Propiedades').delete().eq('id', id);
+      if (error) throw error;
+      await fetchAllData();
+    } catch (err) {
+      alert('Error al eliminar: ' + err.message);
     }
   }
-
-  saveData();
-  renderAll();
-  clearNewSearch();
-  showPanel('busquedas');
 }
 
-// Borrados
-function deleteProperty(id) {
-  if(confirm("¿Eliminar esta propiedad?")) {
-    properties = properties.filter(p => p.id !== id);
-    saveData();
-    renderAll();
+async function deleteSearch(id) {
+  if(confirm("¿Eliminar este cliente y todo su historial de notas?")) {
+    try {
+      // Primero borramos las notas asociadas por integridad relacional
+      await supabase.from('Notas_Seguimiento').delete().eq('cliente_id', id);
+      // Luego borramos el cliente
+      const { error } = await supabase.from('Clientes').delete().eq('id', id);
+      if (error) throw error;
+      await fetchAllData();
+    } catch (err) {
+      alert('Error al eliminar: ' + err.message);
+    }
   }
 }
 
-function deleteSearch(id) {
-  if(confirm("¿Eliminar este cliente y su búsqueda?")) {
-    searches = searches.filter(s => s.id !== id);
-    delete clientNotes[id];
-    saveData();
-    renderAll();
-  }
-}
-
-// Reseteos de formularios
+// RESERTEOS DE FORMULARIO
 function clearNewProp() {
   document.getElementById('np-id').value = '';
   ['np-addr','np-zone','np-type','np-op','np-price','np-sqm','np-rooms','np-owner','np-amenities','np-desc'].forEach(id => { document.getElementById(id).value = ''; });
@@ -798,7 +872,7 @@ function clearNewSearch() {
   document.getElementById('btn-search-text').textContent = "Guardar búsqueda";
 }
 
-// Gestión del modal de notas
+// GESTIÓN DEL MODAL E HISTORIAL DE SEGUIMIENTOS
 function openClientModal(searchId) {
   const s = searches.find(x => x.id === searchId);
   if (!s) return;
@@ -840,35 +914,47 @@ function renderModalNotes() {
     list.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 0">No hay eventos de seguimiento para este cliente.</div>'; 
     return; 
   }
-  list.innerHTML = notes.map((n, i) => `
+  list.innerHTML = notes.map((n) => `
     <div class="note-item">
       <div class="note-item-text">${n.text}</div>
       <div class="note-item-meta">${n.date}</div>
-      <button class="note-delete" onclick="deleteNoteAndRefresh(${i})"><i class="fa-solid fa-xmark"></i></button>
+      <button class="note-delete" onclick="deleteNoteAndRefresh(${n.id})"><i class="fa-solid fa-xmark"></i></button>
     </div>`).join('');
 }
 
-function saveModalNote() {
+// GUARDAR EVENTO DE SEGUIMIENTO EN SUPABASE
+async function saveModalNote() {
   const input = document.getElementById('modal-note-input');
   const text = input.value.trim();
   if (!text) return;
   
-  if (!clientNotes[activeClientId]) clientNotes[activeClientId] = [];
-  const timestamp = new Date().toLocaleDateString('es-AR', { day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit' });
+  const timestamp = new Date().toLocaleDateString('es-AR') + ' ' + new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'});
   
-  clientNotes[activeClientId].unshift({ text, date: timestamp });
-  saveData();
-  input.value = '';
-  renderModalNotes();
-  renderAll();
+  try {
+    const { error } = await supabase.from('Notas_Seguimiento').insert([{
+      cliente_id: activeClientId,
+      texto: text,
+      fecha_string: timestamp
+    }]);
+    if (error) throw error;
+    
+    input.value = '';
+    await fetchAllData();
+    renderModalNotes();
+  } catch (err) {
+    alert('Error al guardar nota: ' + err.message);
+  }
 }
 
-function deleteNoteAndRefresh(idx) {
-  if(clientNotes[activeClientId]) {
-    clientNotes[activeClientId].splice(idx, 1);
-    saveData();
+// BORRAR NOTA DE SEGUIMIENTO EN SUPABASE
+async function deleteNoteAndRefresh(noteId) {
+  try {
+    const { error } = await supabase.from('Notas_Seguimiento').delete().eq('id', noteId);
+    if (error) throw error;
+    await fetchAllData();
     renderModalNotes();
-    renderAll();
+  } catch (err) {
+    alert('Error al borrar nota: ' + err.message);
   }
 }
 
@@ -897,8 +983,10 @@ function exportClientWA() {
   navigator.clipboard.writeText(msg).then(() => alert('✅ ¡Ficha copiada!')).catch(() => alert(msg));
 }
 
-// Ejecutar render inicial
-renderAll();
+// INICIALIZACIÓN DE LA APLICACIÓN DE MANERA ASÍNCRONA
+document.addEventListener('DOMContentLoaded', () => {
+  fetchAllData();
+});
 </script>
 </body>
 </html>
