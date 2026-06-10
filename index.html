@@ -30,6 +30,78 @@
 
   --shadow: 0 1px 3px rgba(0,0,0,0.08),
              0 4px 16px rgba(0,0,0,0.06);
+/* Componente Dropdown de Barrios */
+.dropdown-select-btn {
+  padding: 9px 12px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+.dropdown-select-btn:focus, .dropdown-select-btn.open {
+  border-color: var(--accent);
+  background: #fff;
+}
+.dropdown-select-content {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow);
+  z-index: 100;
+  margin-top: 4px;
+  max-height: 260px;
+  display: flex;
+  flex-direction: column;
+}
+.dropdown-search-wrapper {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+}
+.dropdown-search-wrapper input {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.dropdown-options-list {
+  overflow-y: auto;
+  padding: 6px 0;
+  max-height: 200px;
+}
+.dropdown-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background .1s;
+}
+.dropdown-item-row:hover {
+  background: var(--bg);
+}
+.dropdown-item-row input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.dropdown-item-row label {
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text);
+  cursor: pointer;
+  width: 100%;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -268,7 +340,27 @@ textarea { resize: vertical; min-height: 70px; }
         <input type="hidden" id="np-id"> 
         <div class="form-grid">
           <div class="form-group"><label>Dirección</label><input id="np-addr" placeholder="Ej: Mendoza 1234"></div>
-          <div class="form-group"><label>Barrio / Zona</label><input id="np-zone" placeholder="Ej: Centro, Arroyito, Echesortu"></div>
+         <div class="form-group" style="position: relative;">
+  <label>Barrio / Zona</label>
+  <div id="zone-dropdown-btn" class="dropdown-select-btn" onclick="toggleZoneDropdown(event)">
+    <span id="zone-dropdown-text">Seleccionar barrios...</span>
+    <i class="fa-solid fa-chevron-down"></i>
+  </div>
+  
+  <div id="zone-dropdown-content" class="dropdown-select-content">
+    <div class="dropdown-search-wrapper">
+      <input type="text" id="zone-search" placeholder="Buscar barrio..." oninput="filterBarrios()">
+    </div>
+    <div class="dropdown-options-list" id="barrios-checkboxes-list">
+      </div>
+  </div>
+  <input type="hidden" id="np-zone">
+</div>
+
+<div class="form-group" id="group-other-zone" style="display: none;">
+  <label>Especificar otro barrio</label>
+  <input id="np-other-zone" placeholder="Ej: Pichincha, Refinería..." oninput="updateZoneFromOther()">
+</div>
           <div class="form-group"><label>Tipo</label>
             <select id="np-type"><option value="">Seleccionar...</option><option>Casa</option><option>Depto</option><option>Monoambiente</option><option>Depto pasillo</option><option>Duplex</option><option>Local</option><option>Oficina</option><option>Terreno</option><option>Otro</option></select>
           </div>
@@ -388,6 +480,10 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Hacemos que las funciones sean accesibles globalmente desde los onclick del HTML
 window.showPanel = showPanel;
+  window.toggleZoneDropdown = toggleZoneDropdown;
+window.filterBarrios = filterBarrios;
+window.selectBarrioCheckbox = selectBarrioCheckbox;
+window.updateZoneFromOther = updateZoneFromOther;
 window.clearNewProp = clearNewProp;
 window.clearNewSearch = clearNewSearch;
 window.saveProperty = saveProperty;
@@ -410,7 +506,122 @@ let clientNotes = {};
 let activeClientId = null;
 
 // CARGAR DATOS INICIALES DESDE SUPABASE AL ABRIR LA WEB
-async function fetchAllData() {
+// Array maestro con los barrios solicitados
+const LISTA_BARRIOS = [
+  "17 de Agosto", "Abasto (unificado con Barrio del Abasto)", "Agote (unificado con Luis Agote)", 
+  "Alberdi", "Alberto Olmedo", "Alvear", "Antártida Argentina", "Arroyito (corregido \"Aroyito\")", 
+  "Azcuénaga", "Belgrano", "Bella Vista", "Celedonio Escalada", "Centro", "Cinco Esquinas", 
+  "Costa Alta", "Domingo Faustino Sarmiento", "España y Hospitales", "Esteban Echeverría", 
+  "Fisherton", "Godoy", "Gral. José de San Martín", "Gral. las Heras", "José Ignacio Rucci", 
+  "La Cerámica y Cuyo", "La Florida", "Larrea y Empalme Graneros", "Las Flores", "Las Malvinas", 
+  "Lisandro de la Torre", "Ludueña Sur y Norte", "Martin", "Matheu", "Mercedes de San Martín", 
+  "Nuestra Sra. de la Guardia", "Nuestra Sra. de Lourdes", "Parque Casado", "Parque Field", 
+  "Presidente Roque Saenz Peña", "Puerto Norte", "Remedios de Escalada de San Martín", 
+  "República la 6ta.", "Saladillo Sud", "Tiro Suizo", "Triangulo y Moderno", "Urquiza", 
+  "Villa Manuelita", "Otro"
+];
+
+// Inicializar y renderizar las opciones en el HTML
+function initBarriosDropdown() {
+  const container = document.getElementById('barrios-checkboxes-list');
+  if(!container) return;
+  
+  container.innerHTML = LISTA_BARRIOS.map((barrio, index) => `
+    <div class="dropdown-item-row" data-barrio="${barrio.toLowerCase()}">
+      <input type="checkbox" id="chk-b-${index}" value="${barrio}" onclick="selectBarrioCheckbox()">
+      <label for="chk-b-${index}">${barrio}</label>
+    </div>
+  `).join('');
+}
+
+// Abrir/Cerrar el desplegable
+function toggleZoneDropdown(e) {
+  e.stopPropagation();
+  const content = document.getElementById('zone-dropdown-content');
+  const btn = document.getElementById('zone-dropdown-btn');
+  const isOpen = content.style.display === 'flex';
+  
+  // Cerrar clics externos
+  closeAllDropdowns();
+  
+  if (!isOpen) {
+    content.style.with = "100%";
+    content.style.display = 'flex';
+    btn.classList.add('open');
+    document.getElementById('zone-search').focus();
+  }
+}
+
+// Filtrar barrios en tiempo real mediante el buscador interno
+function filterBarrios() {
+  const query = document.getElementById('zone-search').value.toLowerCase().trim();
+  const rows = document.querySelectorAll('#barrios-checkboxes-list .dropdown-item-row');
+  
+  rows.forEach(row => {
+    const text = row.getAttribute('data-barrio');
+    row.style.display = text.includes(query) ? 'flex' : 'none';
+  });
+}
+
+// Ejecutar cada vez que se tilda o destilda un barrio
+function selectBarrioCheckbox() {
+  const checkboxes = document.querySelectorAll('#barrios-checkboxes-list input[type="checkbox"]');
+  let seleccionados = [];
+  let tieneOtro = false;
+
+  checkboxes.forEach(cb => {
+    if (cb.checked) {
+      if (cb.value === "Otro") {
+        tieneOtro = true;
+      } else {
+        seleccionados.push(cb.value);
+      }
+    }
+  });
+
+  // Controlar visibilidad del input "Otro"
+  const groupOther = document.getElementById('group-other-zone');
+  if (tieneOtro) {
+    groupOther.style.display = 'flex';
+    const valorOtro = document.getElementById('np-other-zone').value.trim();
+    if(valorOtro) seleccionados.push(valorOtro);
+  } else {
+    groupOther.style.display = 'none';
+    document.getElementById('np-other-zone').value = '';
+  }
+
+  // Guardar resultado como string separado por comas en el input oculto original
+  document.getElementById('np-zone').value = seleccionados.join(', ');
+  
+  // Actualizar el texto del botón principal
+  const btnText = document.getElementById('zone-dropdown-text');
+  if (seleccionados.length === 0 && !tieneOtro) {
+    btnText.textContent = "Seleccionar barrios...";
+  } else {
+    btnText.textContent = (tieneOtro && seleccionados.length === 1 ? "" : seleccionados.filter(x => x !== document.getElementById('np-other-zone').value.trim()).join(', ')) + (tieneOtro ? (seleccionados.length > 1 ? ', ' : '') + 'Otro...' : '');
+  }
+}
+
+// Escuchar lo que se escribe en el campo "Otro" e integrarlo a la selección
+function updateZoneFromOther() {
+  selectBarrioCheckbox();
+}
+
+function closeAllDropdowns() {
+  const content = document.getElementById('zone-dropdown-content');
+  const btn = document.getElementById('zone-dropdown-btn');
+  if(content) content.style.display = 'none';
+  if(btn) btn.classList.remove('open');
+}
+
+// Evento global para cerrar el dropdown si se hace clic fuera del mismo
+document.addEventListener('click', (e) => {
+  const dropdown = document.getElementById('zone-dropdown-content');
+  const btn = document.getElementById('zone-dropdown-btn');
+  if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+    closeAllDropdowns();
+  }
+});async function fetchAllData() {
   try {
     // 1. Traer Propiedades (ordenadas por ingreso reciente)
     const { data: propsData, error: propsErr } = await supabase
@@ -684,7 +895,45 @@ function editPropertyForm(id) {
   
   document.getElementById('np-id').value = p.id;
   document.getElementById('np-addr').value = p.addr;
-  document.getElementById('np-zone').value = p.zone;
+  
+  // Reseteamos el dropdown antes de marcar
+  document.getElementById('np-other-zone').value = '';
+  document.getElementById('group-other-zone').style.display = 'none';
+  const checkboxes = document.querySelectorAll('#barrios-checkboxes-list input[type="checkbox"]');
+  checkboxes.forEach(cb => cb.checked = false);
+
+  // Procesar barrios guardados en texto plano
+  if (p.zone) {
+    document.getElementById('np-zone').value = p.zone;
+    const barriosGuardados = p.zone.split(',').map(z => z.trim());
+    let flagOtro = false;
+    let valoresDeOtro = [];
+
+    barriosGuardados.forEach(barrio => {
+      let encontrado = false;
+      checkboxes.forEach(cb => {
+        if (cb.value !== "Otro" && cb.value.toLowerCase() === barrio.toLowerCase()) {
+          cb.checked = true;
+          encontrado = true;
+        }
+      });
+      if (!encontrado && barrio !== "") {
+        flagOtro = true;
+        valoresDeOtro.push(barrio);
+      }
+    });
+
+    if (flagOtro) {
+      const cbOtro = Array.from(checkboxes).find(cb => cb.value === "Otro");
+      if(cbOtro) cbOtro.checked = true;
+      document.getElementById('group-other-zone').style.display = 'flex';
+      document.getElementById('np-other-zone').value = valoresDeOtro.join(', ');
+    }
+  }
+
+  // Ejecutamos para actualizar textos visuales del botón
+  selectBarrioCheckbox();
+
   document.getElementById('np-type').value = p.type;
   document.getElementById('np-op').value = p.op;
   document.getElementById('np-price').value = p.price;
@@ -867,7 +1116,14 @@ function clearNewProp() {
   document.getElementById('form-prop-title').textContent = "Nueva propiedad";
   document.getElementById('form-prop-sub').textContent = "Cargá una propiedad en la base de datos";
   document.getElementById('btn-prop-text').textContent = "Guardar Propiedad";
-}
+// Limpieza del dropdown personalizado de barrios
+  const checkboxes = document.querySelectorAll('#barrios-checkboxes-list input[type="checkbox"]');
+  checkboxes.forEach(cb => cb.checked = false);
+  document.getElementById('np-other-zone').value = '';
+  document.getElementById('group-other-zone').style.display = 'none';
+  document.getElementById('zone-dropdown-text').textContent = "Seleccionar barrios...";
+  document.getElementById('zone-search').value = '';
+  filterBarrios();}
 
 function clearNewSearch() {
   document.getElementById('ns-id').value = '';
@@ -993,6 +1249,9 @@ function exportClientWA() {
 
 // INICIALIZACIÓN DE LA APLICACIÓN DE MANERA ASÍNCRONA
 document.addEventListener('DOMContentLoaded', () => {
+  fetchAllData();
+});document.addEventListener('DOMContentLoaded', () => {
+  initBarriosDropdown(); // <-- Agregá esta línea primero
   fetchAllData();
 });
 </script>
