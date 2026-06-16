@@ -409,9 +409,95 @@ textarea { resize: vertical; min-height: 70px; }
           <div class="form-group"><label>Operación buscada</label>
             <select id="ns-op"><option value="Cualquiera">Cualquiera</option><option value="Venta">Venta</option><option value="Alquiler">Alquiler</option><option value="Alquiler temporario">Alquiler temporario</option></select>
           </div>
-          <div class="form-group"><label>Tipo de propiedad (Separados por coma)</label><input id="ns-type" placeholder="Ej: Casa, Depto, Monoambiente"></div>
-          <div class="form-group"><label>Zonas de interés (Separadas por coma)</label><input id="ns-zones" placeholder="Ej: Centro, Arroyito, Alberdi, Agote"></div>
-          <div class="form-group"><label>Presupuesto máximo (Solo números)</label><input id="ns-budget" type="number" placeholder="Ej: 90000"></div>
+         <div class="form-group" style="position:relative;">
+  <label>Tipo de propiedad</label>
+
+  <div id="type-dropdown-btn" class="dropdown-select-btn">
+    <span id="type-dropdown-text">Seleccionar tipos...</span>
+    <i class="fa-solid fa-chevron-down"></i>
+  </div>
+
+  <div id="type-dropdown-content" class="dropdown-select-content">
+
+    <div class="dropdown-options-list" id="type-checkboxes-list">
+
+      <div class="dropdown-item-row">
+        <input type="checkbox" value="Casa" onchange="updateTypes()">
+        <label>Casa</label>
+      </div>
+
+      <div class="dropdown-item-row">
+        <input type="checkbox" value="Departamento" onchange="updateTypes()">
+        <label>Departamento</label>
+      </div>
+
+      <div class="dropdown-item-row">
+        <input type="checkbox" value="Monoambiente" onchange="updateTypes()">
+        <label>Monoambiente</label>
+      </div>
+
+      <div class="dropdown-item-row">
+        <input type="checkbox" value="PH" onchange="updateTypes()">
+        <label>PH</label>
+      </div>
+
+      <div class="dropdown-item-row">
+        <input type="checkbox" value="Dúplex" onchange="updateTypes()">
+        <label>Dúplex</label>
+      </div>
+
+      <div class="dropdown-item-row">
+        <input type="checkbox" value="Local" onchange="updateTypes()">
+        <label>Local</label>
+      </div>
+
+      <div class="dropdown-item-row">
+        <input type="checkbox" value="Oficina" onchange="updateTypes()">
+        <label>Oficina</label>
+      </div>
+
+      <div class="dropdown-item-row">
+        <input type="checkbox" value="Terreno" onchange="updateTypes()">
+        <label>Terreno</label>
+      </div>
+
+    </div>
+
+  </div>
+
+  <input type="hidden" id="ns-type">
+</div>
+
+<div class="form-group" style="position:relative;">
+  <label>Zonas de interés</label>
+
+  <div id="search-zone-dropdown-btn" class="dropdown-select-btn">
+    <span id="search-zone-dropdown-text">
+      Seleccionar barrios...
+    </span>
+    <i class="fa-solid fa-chevron-down"></i>
+  </div>
+
+  <div id="search-zone-dropdown-content"
+       class="dropdown-select-content">
+
+    <div class="dropdown-search-wrapper">
+      <input
+        type="text"
+        id="search-zone-filter"
+        placeholder="Buscar barrio..."
+      >
+    </div>
+
+    <div
+      class="dropdown-options-list"
+      id="search-zone-checkboxes">
+    </div>
+
+  </div>
+
+  <input type="hidden" id="ns-zones">
+</div> <div class="form-group"><label>Presupuesto máximo (Solo números)</label><input id="ns-budget" type="number" placeholder="Ej: 90000"></div>
           <div class="form-group"><label>Moneda del Presupuesto</label>
             <select id="ns-currency"><option value="USD">USD (Dólares)</option><option value="ARS">ARS ($ Pesos)</option></select>
           </div>
@@ -520,6 +606,94 @@ const LISTA_BARRIOS = [
   "República la 6ta.", "Saladillo Sud", "Tiro Suizo", "Triangulo y Moderno", "Urquiza", 
   "Villa Manuelita", "Otro"
 ];
+  function initSearchZonesDropdown() {
+
+  const container =
+    document.getElementById('search-zone-checkboxes');
+
+  if (!container) return;
+
+  container.innerHTML = LISTA_BARRIOS
+    .filter(b => b !== 'Otro')
+    .map((barrio, i) => `
+      <div class="dropdown-item-row"
+           data-barrio="${barrio.toLowerCase()}">
+
+        <input
+          type="checkbox"
+          id="sz-${i}"
+          value="${barrio}"
+          onchange="updateSearchZones()">
+
+        <label for="sz-${i}">
+          ${barrio}
+        </label>
+
+      </div>
+    `).join('');
+}
+
+function updateSearchZones() {
+
+  const checked =
+    document.querySelectorAll(
+      '#search-zone-checkboxes input:checked'
+    );
+
+  const values =
+    [...checked].map(c => c.value);
+
+  document.getElementById('ns-zones').value =
+    values.join(', ');
+
+  document.getElementById(
+    'search-zone-dropdown-text'
+  ).textContent =
+    values.length
+      ? `${values.length} barrios seleccionados`
+      : 'Seleccionar barrios...';
+}
+
+function filterSearchZones() {
+
+  const query =
+    document.getElementById('search-zone-filter')
+      .value
+      .toLowerCase();
+
+  document
+    .querySelectorAll(
+      '#search-zone-checkboxes .dropdown-item-row'
+    )
+    .forEach(row => {
+
+      row.style.display =
+        row.dataset.barrio.includes(query)
+          ? 'flex'
+          : 'none';
+    });
+}
+
+function updateTypes() {
+
+  const checked =
+    document.querySelectorAll(
+      '#type-checkboxes-list input:checked'
+    );
+
+  const values =
+    [...checked].map(c => c.value);
+
+  document.getElementById('ns-type').value =
+    values.join(', ');
+
+  document.getElementById(
+    'type-dropdown-text'
+  ).textContent =
+    values.length
+      ? values.join(', ')
+      : 'Seleccionar tipos...';
+}
 
 // Inicializar y renderizar las opciones en el HTML
 function initBarriosDropdown() {
@@ -950,6 +1124,27 @@ function editPropertyForm(id) {
   document.getElementById('form-prop-title').textContent = "Editar propiedad";
   document.getElementById('form-prop-sub').textContent = `Modificando la ficha de: ${p.addr}`;
   document.getElementById('btn-prop-text').textContent = "Guardar Cambios";
+  document
+  .getElementById('type-dropdown-btn')
+  ?.addEventListener('click', () => {
+
+    document
+      .getElementById('type-dropdown-content')
+      .classList.toggle('show');
+});
+
+document
+  .getElementById('search-zone-dropdown-btn')
+  ?.addEventListener('click', () => {
+
+    document
+      .getElementById('search-zone-dropdown-content')
+      .classList.toggle('show');
+});
+
+document
+  .getElementById('search-zone-filter')
+  ?.addEventListener('input', filterSearchZones);
   
   showPanel('nueva-prop');
 }
@@ -1252,6 +1447,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchAllData();
 });document.addEventListener('DOMContentLoaded', () => {
   initBarriosDropdown(); // <-- Agregá esta línea primero
+  initSearchZonesDropdown();
   fetchAllData();
 });
 </script>
