@@ -63,6 +63,9 @@
   max-height: 260px;
   display: flex;
   flex-direction: column;
+}/* Agrega esto al final de tu etiqueta <style> */
+.dropdown-select-content.show {
+  display: flex !important;
 }
 .dropdown-search-wrapper {
   padding: 8px;
@@ -412,10 +415,10 @@ textarea { resize: vertical; min-height: 70px; }
          <div class="form-group" style="position:relative;">
   <label>Tipo de propiedad</label>
 
-  <div id="type-dropdown-btn" class="dropdown-select-btn">
-    <span id="type-dropdown-text">Seleccionar tipos...</span>
-    <i class="fa-solid fa-chevron-down"></i>
-  </div>
+ <div id="type-dropdown-btn" class="dropdown-select-btn" onclick="toggleTypeDropdown(event)">
+  <span id="type-dropdown-text">Seleccionar tipos...</span>
+  <i class="fa-solid fa-chevron-down"></i>
+</div>
 
   <div id="type-dropdown-content" class="dropdown-select-content">
 
@@ -471,12 +474,10 @@ textarea { resize: vertical; min-height: 70px; }
 <div class="form-group" style="position:relative;">
   <label>Zonas de interés</label>
 
-  <div id="search-zone-dropdown-btn" class="dropdown-select-btn">
-    <span id="search-zone-dropdown-text">
-      Seleccionar barrios...
-    </span>
-    <i class="fa-solid fa-chevron-down"></i>
-  </div>
+ <div id="search-zone-dropdown-btn" class="dropdown-select-btn" onclick="toggleSearchZoneDropdown(event)">
+  <span id="search-zone-dropdown-text">Seleccionar barrios...</span>
+  <i class="fa-solid fa-chevron-down"></i>
+</div>
 
   <div id="search-zone-dropdown-content"
        class="dropdown-select-content">
@@ -566,9 +567,14 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Hacemos que las funciones sean accesibles globalmente desde los onclick del HTML
 window.showPanel = showPanel;
-  window.toggleZoneDropdown = toggleZoneDropdown;
+window.toggleZoneDropdown = toggleZoneDropdown;
+window.toggleTypeDropdown = toggleTypeDropdown; // Nueva
+window.toggleSearchZoneDropdown = toggleSearchZoneDropdown; // Nueva
 window.filterBarrios = filterBarrios;
+window.filterSearchZones = filterSearchZones; // Nueva
 window.selectBarrioCheckbox = selectBarrioCheckbox;
+window.updateSearchZones = updateSearchZones; // Nueva
+window.updateTypes = updateTypes; // Nueva
 window.updateZoneFromOther = updateZoneFromOther;
 window.clearNewProp = clearNewProp;
 window.clearNewSearch = clearNewSearch;
@@ -717,14 +723,59 @@ function toggleZoneDropdown(e) {
   
   // Cerrar clics externos
   closeAllDropdowns();
-  
   if (!isOpen) {
-    content.style.with = "100%";
     content.style.display = 'flex';
     btn.classList.add('open');
     document.getElementById('zone-search').focus();
   }
+}function toggleTypeDropdown(e) {
+  e.stopPropagation();
+  const content = document.getElementById('type-dropdown-content');
+  const isOpen = content.classList.contains('show');
+  
+  closeAllDropdowns();
+  if (!isOpen) {
+    content.classList.add('show');
+  }
+}function toggleSearchZoneDropdown(e) {
+  e.stopPropagation();
+  const content = document.getElementById('search-zone-dropdown-content');
+  const isOpen = content.classList.contains('show');
+  
+  closeAllDropdowns();
+  if (!isOpen) {
+    content.classList.add('show');
+    document.getElementById('search-zone-filter').focus();
+  }
 }
+
+function closeAllDropdowns() {
+  // Reset de Nueva Propiedad
+  const zoneContent = document.getElementById('zone-dropdown-content');
+  const zoneBtn = document.getElementById('zone-dropdown-btn');
+  if(zoneContent) zoneContent.style.display = 'none';
+  if(zoneBtn) zoneBtn.classList.remove('open');
+
+  // Reset de Nueva Búsqueda
+  const typeContent = document.getElementById('type-dropdown-content');
+  if(typeContent) typeContent.classList.remove('show');
+
+  const searchZoneContent = document.getElementById('search-zone-dropdown-content');
+  if(searchZoneContent) searchZoneContent.classList.remove('show');
+}
+
+// Evento global para cerrar los dropdowns si se hace clic fuera de ellos
+document.addEventListener('click', (e) => {
+  // Chequear si el clic fue dentro de algún contenedor de dropdown operativo
+  const inPropZone = e.target.closest('#zone-dropdown-content') || e.target.closest('#zone-dropdown-btn');
+  const inSearchType = e.target.closest('#type-dropdown-content') || e.target.closest('#type-dropdown-btn');
+  const inSearchZone = e.target.closest('#search-zone-dropdown-content') || e.target.closest('#search-zone-dropdown-btn');
+
+  if (!inPropZone && !inSearchType && !inSearchZone) {
+    closeAllDropdowns();
+  }
+});
+  
 
 // Filtrar barrios en tiempo real mediante el buscador interno
 function filterBarrios() {
@@ -1328,6 +1379,14 @@ function clearNewSearch() {
   document.getElementById('form-search-title').textContent = "Nueva búsqueda";
   document.getElementById('form-search-sub').textContent = "Registrá los requisitos de un cliente";
   document.getElementById('btn-search-text').textContent = "Guardar búsqueda";
+
+  // Agrega estas líneas para resetear la UI de los dropdowns de búsqueda:
+  document.getElementById('type-dropdown-text').textContent = "Seleccionar tipos...";
+  document.getElementById('search-zone-dropdown-text').textContent = "Seleccionar barrios...";
+  const checkboxes = document.querySelectorAll('#type-checkboxes-list input, #search-zone-checkboxes input');
+  checkboxes.forEach(cb => cb.checked = false);
+  if(document.getElementById('search-zone-filter')) document.getElementById('search-zone-filter').value = '';
+  filterSearchZones();
 }
 
 // GESTIÓN DEL MODAL E HISTORIAL DE SEGUIMIENTOS
