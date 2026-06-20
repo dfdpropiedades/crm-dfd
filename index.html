@@ -1,3 +1,5 @@
+
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -29,7 +31,9 @@
   --r-sm: 6px;
 
   --shadow: 0 1px 3px rgba(0,0,0,0.08),
-             0 4px 16px rgba(0,0,0,0.06);
+            0 4px 16px rgba(0,0,0,0.06);
+}
+
 /* Componente Dropdown de Barrios */
 .dropdown-select-btn {
   padding: 9px 12px;
@@ -63,7 +67,7 @@
   max-height: 260px;
   display: flex;
   flex-direction: column;
-}/* Agrega esto al final de tu etiqueta <style> */
+}
 .dropdown-select-content.show {
   display: flex !important;
 }
@@ -111,9 +115,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 /* LAYOUT */
 .app-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
-.sidebar {
-  background: #0B2A1B;
-}
+.sidebar { background: #0B2A1B; }
 .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .sidebar-logo .brand { font-family: 'DM Serif Display', serif; font-size: 20px; line-height: 1.2; color: #fff; }
 .sidebar-logo .sub { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
@@ -141,10 +143,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 18px 20px; }
 .stat-num { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); line-height: 1; }
 .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
-.stat-card.accent {
-  background: linear-gradient(135deg, #0F6B3A, #0A4F2B);
-  border-color: #0F6B3A;
-}
+.stat-card.accent { background: linear-gradient(135deg, #0F6B3A, #0A4F2B); border-color: #0F6B3A; }
 .stat-card.accent .stat-num, .stat-card.accent .stat-label { color: #fff; }
 .stat-card.accent .stat-label { opacity: 0.8; }
 
@@ -274,7 +273,6 @@ textarea { resize: vertical; min-height: 70px; }
   </aside>
 
   <main class="main">
-
     <div id="panel-dashboard" class="panel active">
       <div class="page-header">
         <div class="page-title">Dashboard</div>
@@ -343,27 +341,24 @@ textarea { resize: vertical; min-height: 70px; }
         <input type="hidden" id="np-id"> 
         <div class="form-grid">
           <div class="form-group"><label>Dirección</label><input id="np-addr" placeholder="Ej: Mendoza 1234"></div>
-         <div class="form-group" style="position: relative;">
-  <label>Barrio / Zona</label>
-  <div id="zone-dropdown-btn" class="dropdown-select-btn" onclick="toggleZoneDropdown(event)">
-    <span id="zone-dropdown-text">Seleccionar barrios...</span>
-    <i class="fa-solid fa-chevron-down"></i>
-  </div>
-  
-  <div id="zone-dropdown-content" class="dropdown-select-content">
-    <div class="dropdown-search-wrapper">
-      <input type="text" id="zone-search" placeholder="Buscar barrio..." oninput="filterBarrios()">
-    </div>
-    <div class="dropdown-options-list" id="barrios-checkboxes-list">
-      </div>
-  </div>
-  <input type="hidden" id="np-zone">
-</div>
-
-<div class="form-group" id="group-other-zone" style="display: none;">
-  <label>Especificar otro barrio</label>
-  <input id="np-other-zone" placeholder="Ej: Pichincha, Refinería..." oninput="updateZoneFromOther()">
-</div>
+          <div class="form-group" style="position: relative;">
+            <label>Barrio / Zona</label>
+            <div id="zone-dropdown-btn" class="dropdown-select-btn" onclick="toggleZoneDropdown(event)">
+              <span id="zone-dropdown-text">Seleccionar barrios...</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div id="zone-dropdown-content" class="dropdown-select-content">
+              <div class="dropdown-search-wrapper">
+                <input type="text" id="zone-search" placeholder="Buscar barrio..." oninput="filterBarrios()">
+              </div>
+              <div class="dropdown-options-list" id="barrios-checkboxes-list"></div>
+            </div>
+            <input type="hidden" id="np-zone">
+          </div>
+          <div class="form-group" id="group-other-zone" style="display: none;">
+            <label>Especificar otro barrio</label>
+            <input id="np-other-zone" placeholder="Ej: Pichincha, Refinería..." oninput="updateZoneFromOther()">
+          </div>
           <div class="form-group"><label>Tipo</label>
             <select id="np-type"><option value="">Seleccionar...</option><option>Casa</option><option>Depto</option><option>Monoambiente</option><option>Depto pasillo</option><option>Duplex</option><option>Local</option><option>Oficina</option><option>Terreno</option><option>Otro</option></select>
           </div>
@@ -412,93 +407,41 @@ textarea { resize: vertical; min-height: 70px; }
           <div class="form-group"><label>Operación buscada</label>
             <select id="ns-op"><option value="Cualquiera">Cualquiera</option><option value="Venta">Venta</option><option value="Alquiler">Alquiler</option><option value="Alquiler temporario">Alquiler temporario</option></select>
           </div>
-         <div class="form-group" style="position:relative;">
-  <label>Tipo de propiedad</label>
-
- <div id="type-dropdown-btn" class="dropdown-select-btn" onclick="toggleTypeDropdown(event)">
-  <span id="type-dropdown-text">Seleccionar tipos...</span>
-  <i class="fa-solid fa-chevron-down"></i>
-</div>
-
-  <div id="type-dropdown-content" class="dropdown-select-content">
-
-    <div class="dropdown-options-list" id="type-checkboxes-list">
-
-      <div class="dropdown-item-row">
-        <input type="checkbox" value="Casa" onchange="updateTypes()">
-        <label>Casa</label>
-      </div>
-
-      <div class="dropdown-item-row">
-        <input type="checkbox" value="Departamento" onchange="updateTypes()">
-        <label>Departamento</label>
-      </div>
-
-      <div class="dropdown-item-row">
-        <input type="checkbox" value="Monoambiente" onchange="updateTypes()">
-        <label>Monoambiente</label>
-      </div>
-
-      <div class="dropdown-item-row">
-        <input type="checkbox" value="PH" onchange="updateTypes()">
-        <label>PH</label>
-      </div>
-
-      <div class="dropdown-item-row">
-        <input type="checkbox" value="Dúplex" onchange="updateTypes()">
-        <label>Dúplex</label>
-      </div>
-
-      <div class="dropdown-item-row">
-        <input type="checkbox" value="Local" onchange="updateTypes()">
-        <label>Local</label>
-      </div>
-
-      <div class="dropdown-item-row">
-        <input type="checkbox" value="Oficina" onchange="updateTypes()">
-        <label>Oficina</label>
-      </div>
-
-      <div class="dropdown-item-row">
-        <input type="checkbox" value="Terreno" onchange="updateTypes()">
-        <label>Terreno</label>
-      </div>
-
-    </div>
-
-  </div>
-
-  <input type="hidden" id="ns-type">
-</div>
-
-<div class="form-group" style="position:relative;">
-  <label>Zonas de interés</label>
-
- <div id="search-zone-dropdown-btn" class="dropdown-select-btn" onclick="toggleSearchZoneDropdown(event)">
-  <span id="search-zone-dropdown-text">Seleccionar barrios...</span>
-  <i class="fa-solid fa-chevron-down"></i>
-</div>
-
-  <div id="search-zone-dropdown-content"
-       class="dropdown-select-content">
-
-    <div class="dropdown-search-wrapper">
-      <input
-        type="text"
-        id="search-zone-filter"
-        placeholder="Buscar barrio..."
-      >
-    </div>
-
-    <div
-      class="dropdown-options-list"
-      id="search-zone-checkboxes">
-    </div>
-
-  </div>
-
-  <input type="hidden" id="ns-zones">
-</div> <div class="form-group"><label>Presupuesto máximo (Solo números)</label><input id="ns-budget" type="number" placeholder="Ej: 90000"></div>
+          <div class="form-group" style="position:relative;">
+            <label>Tipo de propiedad</label>
+            <div id="type-dropdown-btn" class="dropdown-select-btn" onclick="toggleTypeDropdown(event)">
+              <span id="type-dropdown-text">Seleccionar tipos...</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div id="type-dropdown-content" class="dropdown-select-content">
+              <div class="dropdown-options-list" id="type-checkboxes-list">
+                <div class="dropdown-item-row"><input type="checkbox" value="Casa" onchange="updateTypes()"><label>Casa</label></div>
+                <div class="dropdown-item-row"><input type="checkbox" value="Departamento" onchange="updateTypes()"><label>Departamento</label></div>
+                <div class="dropdown-item-row"><input type="checkbox" value="Monoambiente" onchange="updateTypes()"><label>Monoambiente</label></div>
+                <div class="dropdown-item-row"><input type="checkbox" value="PH" onchange="updateTypes()"><label>PH</label></div>
+                <div class="dropdown-item-row"><input type="checkbox" value="Dúplex" onchange="updateTypes()"><label>Dúplex</label></div>
+                <div class="dropdown-item-row"><input type="checkbox" value="Local" onchange="updateTypes()"><label>Local</label></div>
+                <div class="dropdown-item-row"><input type="checkbox" value="Oficina" onchange="updateTypes()"><label>Oficina</label></div>
+                <div class="dropdown-item-row"><input type="checkbox" value="Terreno" onchange="updateTypes()"><label>Terreno</label></div>
+              </div>
+            </div>
+            <input type="hidden" id="ns-type">
+          </div>
+          <div class="form-group" style="position:relative;">
+            <label>Zonas de interés</label>
+            <div id="search-zone-dropdown-btn" class="dropdown-select-btn" onclick="toggleSearchZoneDropdown(event)">
+              <span id="search-zone-dropdown-text">Seleccionar barrios...</span>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div id="search-zone-dropdown-content" class="dropdown-select-content">
+              <div class="dropdown-search-wrapper">
+                <input type="text" id="search-zone-filter" placeholder="Buscar barrio..." oninput="filterSearchZones()">
+              </div>
+              <div class="dropdown-options-list" id="search-zone-checkboxes"></div>
+            </div>
+            <input type="hidden" id="ns-zones">
+          </div> 
+          <div class="form-group"><label>Presupuesto máximo (Solo números)</label><input id="ns-budget" type="number" placeholder="Ej: 90000"></div>
           <div class="form-group"><label>Moneda del Presupuesto</label>
             <select id="ns-currency"><option value="USD">USD (Dólares)</option><option value="ARS">ARS ($ Pesos)</option></select>
           </div>
@@ -519,7 +462,6 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
       </div>
     </div>
-
   </main>
 </div>
 
@@ -565,16 +507,15 @@ const SUPABASE_ANON_KEY = 'sb_publishable_oEhi6qpIs3cZg-fVEUKsug_aVwsfGZc'
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// Hacemos que las funciones sean accesibles globalmente desde los onclick del HTML
 window.showPanel = showPanel;
 window.toggleZoneDropdown = toggleZoneDropdown;
-window.toggleTypeDropdown = toggleTypeDropdown; // Nueva
-window.toggleSearchZoneDropdown = toggleSearchZoneDropdown; // Nueva
+window.toggleTypeDropdown = toggleTypeDropdown;
+window.toggleSearchZoneDropdown = toggleSearchZoneDropdown;
 window.filterBarrios = filterBarrios;
-window.filterSearchZones = filterSearchZones; // Nueva
+window.filterSearchZones = filterSearchZones;
 window.selectBarrioCheckbox = selectBarrioCheckbox;
-window.updateSearchZones = updateSearchZones; // Nueva
-window.updateTypes = updateTypes; // Nueva
+window.updateSearchZones = updateSearchZones;
+window.updateTypes = updateTypes;
 window.updateZoneFromOther = updateZoneFromOther;
 window.clearNewProp = clearNewProp;
 window.clearNewSearch = clearNewSearch;
@@ -591,14 +532,11 @@ window.saveModalNote = saveModalNote;
 window.deleteNoteAndRefresh = deleteNoteAndRefresh;
 window.exportClientWA = exportClientWA;
 
-// Estados de la app en memoria global
 let properties = [];
 let searches = [];
 let clientNotes = {};
 let activeClientId = null;
 
-// CARGAR DATOS INICIALES DESDE SUPABASE AL ABRIR LA WEB
-// Array maestro con los barrios solicitados
 const LISTA_BARRIOS = [
   "17 de Agosto", "Abasto (unificado con Barrio del Abasto)", "Agote (unificado con Luis Agote)", 
   "Alberdi", "Alberto Olmedo", "Alvear", "Antártida Argentina", "Arroyito (corregido \"Aroyito\")", 
@@ -612,100 +550,23 @@ const LISTA_BARRIOS = [
   "República la 6ta.", "Saladillo Sud", "Tiro Suizo", "Triangulo y Moderno", "Urquiza", 
   "Villa Manuelita", "Otro"
 ];
-  function initSearchZonesDropdown() {
 
-  const container =
-    document.getElementById('search-zone-checkboxes');
-
+function initSearchZonesDropdown() {
+  const container = document.getElementById('search-zone-checkboxes');
   if (!container) return;
-
   container.innerHTML = LISTA_BARRIOS
     .filter(b => b !== 'Otro')
     .map((barrio, i) => `
-      <div class="dropdown-item-row"
-           data-barrio="${barrio.toLowerCase()}">
-
-        <input
-          type="checkbox"
-          id="sz-${i}"
-          value="${barrio}"
-          onchange="updateSearchZones()">
-
-        <label for="sz-${i}">
-          ${barrio}
-        </label>
-
+      <div class="dropdown-item-row" data-barrio="${barrio.toLowerCase()}">
+        <input type="checkbox" id="sz-${i}" value="${barrio}" onchange="updateSearchZones()">
+        <label for="sz-${i}">${barrio}</label>
       </div>
     `).join('');
 }
 
-function updateSearchZones() {
-
-  const checked =
-    document.querySelectorAll(
-      '#search-zone-checkboxes input:checked'
-    );
-
-  const values =
-    [...checked].map(c => c.value);
-
-  document.getElementById('ns-zones').value =
-    values.join(', ');
-
-  document.getElementById(
-    'search-zone-dropdown-text'
-  ).textContent =
-    values.length
-      ? `${values.length} barrios seleccionados`
-      : 'Seleccionar barrios...';
-}
-
-function filterSearchZones() {
-
-  const query =
-    document.getElementById('search-zone-filter')
-      .value
-      .toLowerCase();
-
-  document
-    .querySelectorAll(
-      '#search-zone-checkboxes .dropdown-item-row'
-    )
-    .forEach(row => {
-
-      row.style.display =
-        row.dataset.barrio.includes(query)
-          ? 'flex'
-          : 'none';
-    });
-}
-
-function updateTypes() {
-
-  const checked =
-    document.querySelectorAll(
-      '#type-checkboxes-list input:checked'
-    );
-
-  const values =
-    [...checked].map(c => c.value);
-
-  document.getElementById('ns-type').value =
-    values.join(', ');
-
-  document.getElementById(
-    'type-dropdown-text'
-  ).textContent =
-    values.length
-      ? values.join(', ')
-      : 'Seleccionar tipos...';
-}
-
-// Inicializar y renderizar las opciones en el HTML
 function initBarriosDropdown() {
   const container = document.getElementById('barrios-checkboxes-list');
   if(!container) return;
-  
   container.innerHTML = LISTA_BARRIOS.map((barrio, index) => `
     <div class="dropdown-item-row" data-barrio="${barrio.toLowerCase()}">
       <input type="checkbox" id="chk-b-${index}" value="${barrio}" onclick="selectBarrioCheckbox()">
@@ -714,21 +575,21 @@ function initBarriosDropdown() {
   `).join('');
 }
 
-// Abrir/Cerrar el desplegable
 function toggleZoneDropdown(e) {
   e.stopPropagation();
   const content = document.getElementById('zone-dropdown-content');
   const btn = document.getElementById('zone-dropdown-btn');
   const isOpen = content.style.display === 'flex';
   
-  // Cerrar clics externos
   closeAllDropdowns();
   if (!isOpen) {
     content.style.display = 'flex';
     btn.classList.add('open');
     document.getElementById('zone-search').focus();
   }
-}function toggleTypeDropdown(e) {
+}
+
+function toggleTypeDropdown(e) {
   e.stopPropagation();
   const content = document.getElementById('type-dropdown-content');
   const isOpen = content.classList.contains('show');
@@ -737,7 +598,9 @@ function toggleZoneDropdown(e) {
   if (!isOpen) {
     content.classList.add('show');
   }
-}function toggleSearchZoneDropdown(e) {
+}
+
+function toggleSearchZoneDropdown(e) {
   e.stopPropagation();
   const content = document.getElementById('search-zone-dropdown-content');
   const isOpen = content.classList.contains('show');
@@ -750,13 +613,11 @@ function toggleZoneDropdown(e) {
 }
 
 function closeAllDropdowns() {
-  // Reset de Nueva Propiedad
   const zoneContent = document.getElementById('zone-dropdown-content');
   const zoneBtn = document.getElementById('zone-dropdown-btn');
   if(zoneContent) zoneContent.style.display = 'none';
   if(zoneBtn) zoneBtn.classList.remove('open');
 
-  // Reset de Nueva Búsqueda
   const typeContent = document.getElementById('type-dropdown-content');
   if(typeContent) typeContent.classList.remove('show');
 
@@ -764,9 +625,7 @@ function closeAllDropdowns() {
   if(searchZoneContent) searchZoneContent.classList.remove('show');
 }
 
-// Evento global para cerrar los dropdowns si se hace clic fuera de ellos
 document.addEventListener('click', (e) => {
-  // Chequear si el clic fue dentro de algún contenedor de dropdown operativo
   const inPropZone = e.target.closest('#zone-dropdown-content') || e.target.closest('#zone-dropdown-btn');
   const inSearchType = e.target.closest('#type-dropdown-content') || e.target.closest('#type-dropdown-btn');
   const inSearchZone = e.target.closest('#search-zone-dropdown-content') || e.target.closest('#search-zone-dropdown-btn');
@@ -775,20 +634,25 @@ document.addEventListener('click', (e) => {
     closeAllDropdowns();
   }
 });
-  
 
-// Filtrar barrios en tiempo real mediante el buscador interno
 function filterBarrios() {
   const query = document.getElementById('zone-search').value.toLowerCase().trim();
   const rows = document.querySelectorAll('#barrios-checkboxes-list .dropdown-item-row');
-  
   rows.forEach(row => {
     const text = row.getAttribute('data-barrio');
     row.style.display = text.includes(query) ? 'flex' : 'none';
   });
 }
 
-// Ejecutar cada vez que se tilda o destilda un barrio
+function filterSearchZones() {
+  const query = document.getElementById('search-zone-filter').value.toLowerCase().trim();
+  const rows = document.querySelectorAll('#search-zone-checkboxes .dropdown-item-row');
+  rows.forEach(row => {
+    const text = row.getAttribute('data-barrio');
+    row.style.display = text.includes(query) ? 'flex' : 'none';
+  });
+}
+
 function selectBarrioCheckbox() {
   const checkboxes = document.querySelectorAll('#barrios-checkboxes-list input[type="checkbox"]');
   let seleccionados = [];
@@ -804,7 +668,6 @@ function selectBarrioCheckbox() {
     }
   });
 
-  // Controlar visibilidad del input "Otro"
   const groupOther = document.getElementById('group-other-zone');
   if (tieneOtro) {
     groupOther.style.display = 'flex';
@@ -815,10 +678,8 @@ function selectBarrioCheckbox() {
     document.getElementById('np-other-zone').value = '';
   }
 
-  // Guardar resultado como string separado por comas en el input oculto original
   document.getElementById('np-zone').value = seleccionados.join(', ');
   
-  // Actualizar el texto del botón principal
   const btnText = document.getElementById('zone-dropdown-text');
   if (seleccionados.length === 0 && !tieneOtro) {
     btnText.textContent = "Seleccionar barrios...";
@@ -827,28 +688,26 @@ function selectBarrioCheckbox() {
   }
 }
 
-// Escuchar lo que se escribe en el campo "Otro" e integrarlo a la selección
+function updateSearchZones() {
+  const checked = document.querySelectorAll('#search-zone-checkboxes input:checked');
+  const values = [...checked].map(c => c.value);
+  document.getElementById('ns-zones').value = values.join(', ');
+  document.getElementById('search-zone-dropdown-text').textContent = values.length ? `${values.length} barrios seleccionados` : 'Seleccionar barrios...';
+}
+
+function updateTypes() {
+  const checked = document.querySelectorAll('#type-checkboxes-list input:checked');
+  const values = [...checked].map(c => c.value);
+  document.getElementById('ns-type').value = values.join(', ');
+  document.getElementById('type-dropdown-text').textContent = values.length ? values.join(', ') : 'Seleccionar tipos...';
+}
+
 function updateZoneFromOther() {
   selectBarrioCheckbox();
 }
 
-function closeAllDropdowns() {
-  const content = document.getElementById('zone-dropdown-content');
-  const btn = document.getElementById('zone-dropdown-btn');
-  if(content) content.style.display = 'none';
-  if(btn) btn.classList.remove('open');
-}
-
-// Evento global para cerrar el dropdown si se hace clic fuera del mismo
-document.addEventListener('click', (e) => {
-  const dropdown = document.getElementById('zone-dropdown-content');
-  const btn = document.getElementById('zone-dropdown-btn');
-  if (dropdown && !dropdown.contains(e.target) && !btn.contains(e.target)) {
-    closeAllDropdowns();
-  }
-});async function fetchAllData() {
+async function fetchAllData() {
   try {
-    // 1. Traer Propiedades (ordenadas por ingreso reciente)
     const { data: propsData, error: propsErr } = await supabase
       .from('Propiedades')
       .select('*')
@@ -856,14 +715,12 @@ document.addEventListener('click', (e) => {
     if (propsErr) throw propsErr;
     properties = propsData || [];
 
-    // 2. Traer Búsquedas / Clientes
     const { data: searchData, error: searchErr } = await supabase
       .from('Clientes')
       .select('*')
       .order('id', { ascending: false });
     if (searchErr) throw searchErr;
     
-    // Mapeamos las columnas de Supabase al formato que espera tu frontend actual
     searches = (searchData || []).map(s => ({
       id: s.id,
       date: s.created_at ? new Date(s.created_at).toLocaleDateString('es-AR') : 'Sin fecha',
@@ -883,7 +740,6 @@ document.addEventListener('click', (e) => {
       notes: s.Notas_iniciales
     }));
 
-    // 3. Traer Notas de seguimiento globales
     const { data: notesData, error: notesErr } = await supabase
       .from('Notas_Seguimiento')
       .select('*')
@@ -920,7 +776,6 @@ function formatPrice(price, currency) {
   return (currency === "USD" ? "USD " : "$ ") + Number(price).toLocaleString('es-AR');
 }
 
-// Renders visuales de tarjetas
 function renderPropCard(p, mini=false) {
   return `<div class="item-card">
     <div class="item-card-top">
@@ -1015,7 +870,6 @@ function showPanel(id) {
   if(targetNav) targetNav.classList.add('active');
 }
 
-// Algorítmo de cruce Inteligente
 function calculateLocalScore(prop, search) {
   if (search.op && search.op !== "Cualquiera" && search.op.toLowerCase() !== prop.op.toLowerCase()) return 'incompatible';
 
@@ -1113,7 +967,6 @@ function runMatching(propId) {
   container.innerHTML = html;
 }
 
-// FORMULARIOS DE EDICIÓN (PRE-CARGA)
 function editPropertyForm(id) {
   const p = properties.find(x => x.id === id);
   if(!p) return;
@@ -1121,13 +974,11 @@ function editPropertyForm(id) {
   document.getElementById('np-id').value = p.id;
   document.getElementById('np-addr').value = p.addr;
   
-  // Reseteamos el dropdown antes de marcar
   document.getElementById('np-other-zone').value = '';
   document.getElementById('group-other-zone').style.display = 'none';
   const checkboxes = document.querySelectorAll('#barrios-checkboxes-list input[type="checkbox"]');
   checkboxes.forEach(cb => cb.checked = false);
 
-  // Procesar barrios guardados en texto plano
   if (p.zone) {
     document.getElementById('np-zone').value = p.zone;
     const barriosGuardados = p.zone.split(',').map(z => z.trim());
@@ -1156,7 +1007,6 @@ function editPropertyForm(id) {
     }
   }
 
-  // Ejecutamos para actualizar textos visuales del botón
   selectBarrioCheckbox();
 
   document.getElementById('np-type').value = p.type;
@@ -1175,27 +1025,6 @@ function editPropertyForm(id) {
   document.getElementById('form-prop-title').textContent = "Editar propiedad";
   document.getElementById('form-prop-sub').textContent = `Modificando la ficha de: ${p.addr}`;
   document.getElementById('btn-prop-text').textContent = "Guardar Cambios";
-  document
-  .getElementById('type-dropdown-btn')
-  ?.addEventListener('click', () => {
-
-    document
-      .getElementById('type-dropdown-content')
-      .classList.toggle('show');
-});
-
-document
-  .getElementById('search-zone-dropdown-btn')
-  ?.addEventListener('click', () => {
-
-    document
-      .getElementById('search-zone-dropdown-content')
-      .classList.toggle('show');
-});
-
-document
-  .getElementById('search-zone-filter')
-  ?.addEventListener('input', filterSearchZones);
   
   showPanel('nueva-prop');
 }
@@ -1220,6 +1049,29 @@ function editSearchForm(id) {
   document.getElementById('ns-inv').checked = !!s.inv;
   document.getElementById('ns-notes').value = s.notes || '';
 
+  // Marcar checkboxes correspondientes a tipos guardados
+  const typeCheckboxes = document.querySelectorAll('#type-checkboxes-list input[type="checkbox"]');
+  typeCheckboxes.forEach(cb => cb.checked = false);
+  if (s.type) {
+    const tiposGuardados = s.type.split(',').map(t => t.trim().toLowerCase());
+    typeCheckboxes.forEach(cb => {
+      if(tiposGuardados.includes(cb.value.toLowerCase())) cb.checked = true;
+    });
+  }
+
+  // Marcar checkboxes correspondientes a zonas guardadas
+  const zoneCheckboxes = document.querySelectorAll('#search-zone-checkboxes input[type="checkbox"]');
+  zoneCheckboxes.forEach(cb => cb.checked = false);
+  if (s.zones) {
+    const zonasGuardadas = s.zones.split(',').map(z => z.trim().toLowerCase());
+    zoneCheckboxes.forEach(cb => {
+      if(zonasGuardadas.includes(cb.value.toLowerCase())) cb.checked = true;
+    });
+  }
+
+  updateTypes();
+  updateSearchZones();
+
   document.getElementById('form-search-title').textContent = "Editar búsqueda";
   document.getElementById('form-search-sub').textContent = `Modificando los requisitos de: ${s.name}`;
   document.getElementById('btn-search-text').textContent = "Guardar Cambios";
@@ -1227,7 +1079,6 @@ function editSearchForm(id) {
   showPanel('nueva-busqueda');
 }
 
-// PERSISTENCIA: GUARDAR PROPIEDAD EN SUPABASE
 async function saveProperty() {
   const id = document.getElementById('np-id').value;
   const addr = document.getElementById('np-addr').value.trim();
@@ -1272,7 +1123,6 @@ async function saveProperty() {
   }
 }
 
-// PERSISTENCIA: GUARDAR CLIENTE / BÚSQUEDA EN SUPABASE
 async function saveSearch() {
   const id = document.getElementById('ns-id').value;
   const name = document.getElementById('ns-name').value.trim();
@@ -1327,7 +1177,6 @@ async function saveSearch() {
   }
 }
 
-// ELIMINAR REGISTROS
 async function deleteProperty(id) {
   if(confirm("¿Eliminar esta propiedad definitivamente de Supabase?")) {
     try {
@@ -1353,7 +1202,6 @@ async function deleteSearch(id) {
   }
 }
 
-// RESERTEOS DE FORMULARIO
 function clearNewProp() {
   document.getElementById('np-id').value = '';
   ['np-addr','np-zone','np-type','np-op','np-price','np-sqm','np-rooms','np-owner','np-amenities','np-desc'].forEach(id => { document.getElementById(id).value = ''; });
@@ -1362,14 +1210,15 @@ function clearNewProp() {
   document.getElementById('form-prop-title').textContent = "Nueva propiedad";
   document.getElementById('form-prop-sub').textContent = "Cargá una propiedad en la base de datos";
   document.getElementById('btn-prop-text').textContent = "Guardar Propiedad";
-// Limpieza del dropdown personalizado de barrios
+
   const checkboxes = document.querySelectorAll('#barrios-checkboxes-list input[type="checkbox"]');
   checkboxes.forEach(cb => cb.checked = false);
   document.getElementById('np-other-zone').value = '';
   document.getElementById('group-other-zone').style.display = 'none';
   document.getElementById('zone-dropdown-text').textContent = "Seleccionar barrios...";
   document.getElementById('zone-search').value = '';
-  filterBarrios();}
+  filterBarrios();
+}
 
 function clearNewSearch() {
   document.getElementById('ns-id').value = '';
@@ -1380,7 +1229,6 @@ function clearNewSearch() {
   document.getElementById('form-search-sub').textContent = "Registrá los requisitos de un cliente";
   document.getElementById('btn-search-text').textContent = "Guardar búsqueda";
 
-  // Agrega estas líneas para resetear la UI de los dropdowns de búsqueda:
   document.getElementById('type-dropdown-text').textContent = "Seleccionar tipos...";
   document.getElementById('search-zone-dropdown-text').textContent = "Seleccionar barrios...";
   const checkboxes = document.querySelectorAll('#type-checkboxes-list input, #search-zone-checkboxes input');
@@ -1389,7 +1237,6 @@ function clearNewSearch() {
   filterSearchZones();
 }
 
-// GESTIÓN DEL MODAL E HISTORIAL DE SEGUIMIENTOS
 function openClientModal(searchId) {
   const s = searches.find(x => x.id === searchId);
   if (!s) return;
@@ -1419,7 +1266,6 @@ function openClientModal(searchId) {
   else cw.style.display = 'none';
 
   renderModalNotes();
-  document.getElementById('client-modal').open = true; // Forzar render
   document.getElementById('client-modal').classList.add('open');
   document.getElementById('modal-note-input').focus();
 }
@@ -1440,7 +1286,6 @@ function renderModalNotes() {
     </div>`).join('');
 }
 
-// GUARDAR EVENTO DE SEGUIMIENTO EN SUPABASE
 async function saveModalNote() {
   const input = document.getElementById('modal-note-input');
   const text = input.value.trim();
@@ -1464,7 +1309,6 @@ async function saveModalNote() {
   }
 }
 
-// BORRAR NOTA DE SEGUIMIENTO EN SUPABASE
 async function deleteNoteAndRefresh(noteId) {
   try {
     const { error } = await supabase.from('Notas_Seguimiento').delete().eq('id', noteId);
@@ -1501,14 +1345,13 @@ function exportClientWA() {
   navigator.clipboard.writeText(msg).then(() => alert('✅ ¡Ficha copiada!')).catch(() => alert(msg));
 }
 
-// INICIALIZACIÓN DE LA APLICACIÓN DE MANERA ASÍNCRONA
 document.addEventListener('DOMContentLoaded', () => {
-  fetchAllData();
-});document.addEventListener('DOMContentLoaded', () => {
-  initBarriosDropdown(); // <-- Agregá esta línea primero
+  initBarriosDropdown();
   initSearchZonesDropdown();
   fetchAllData();
 });
 </script>
 </body>
 </html>
+
+```
